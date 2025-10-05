@@ -105,54 +105,55 @@
       box-sizing: border-box;
     }
     
-    /* === [NOVO] ESTILO PARA O TEXTO DE CRÉDITO === */
     .creator-credit {
         position: absolute;
-        bottom: 10px; /* Movido para baixo */
-        left: 50%; /* Centralizado */
-        transform: translateX(-50%); /* Centralizado */
-        font-size: 0.75rem; /* 12px */
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.75rem;
         color: var(--text-color);
         opacity: 0.6;
         font-weight: 400;
         z-index: 5;
     }
     
-    /* === [AJUSTE] NOVO CONTÊINER PARA OS CONTROLES DO TOPO === */
+    /* === [AJUSTE] CONTÊINER DO TOPO COM GRID PARA LARGURA IGUAL === */
     .top-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* Cria 3 colunas de largura igual */
+      gap: 12px;
+      align-items: start;
       margin-bottom: 24px;
     }
-
-    .right-header-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* SELETOR DE TEMAS ESTILO GAVETA (MODIFICADO) */
-    .theme-drawer {
-        position: relative;
-    }
-
-    .theme-toggle-btn, .history-btn { /* Estilo unificado */
+    
+    /* === [AJUSTE] ESTILO UNIFICADO PARA OS 3 BOTÕES DO TOPO === */
+    .method-toggle-btn, .history-btn, .theme-toggle-btn {
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid var(--border-color);
         color: var(--text-color);
-        padding: 8px 16px;
+        padding: 8px 12px;
         border-radius: 20px;
         cursor: pointer;
         font-family: var(--font-family);
         font-weight: 600;
         transition: all 0.3s ease;
+        width: 100%; /* Ocupa 100% da célula do grid */
+        box-sizing: border-box; /* Garante que o padding não quebre o layout */
+        white-space: nowrap; /* Impede a quebra de texto */
+        text-align: center;
+        font-size: 0.85rem; /* Fonte ligeiramente menor para caber melhor */
+        overflow: hidden; /* Esconde texto que possa transbordar */
+        text-overflow: ellipsis; /* Adiciona '...' se o texto for muito grande */
     }
 
-    .theme-toggle-btn:hover, .history-btn:hover { /* Estilo unificado */
+    .method-toggle-btn:hover, .history-btn:hover, .theme-toggle-btn:hover {
         background: rgba(255, 255, 255, 0.2);
     }
 
+    .method-drawer, .theme-drawer {
+      position: relative;
+    }
+    
     .theme-options {
         position: absolute;
         top: calc(100% + 8px);
@@ -192,27 +193,7 @@
     .theme-dot[data-theme="ocean"] { background: linear-gradient(135deg, #005aa7 0%, #00c6ff 100%); }
     .theme-dot[data-theme="forest"] { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
     .theme-dot[data-theme="dark-rose"] { background: linear-gradient(135deg, #e83e8c 0%, #6f42c1 100%); }
-
-    /* === [AJUSTE] SELETOR DE MÉTODO DE ANAMNESE === */
-    .method-drawer {
-        position: relative; /* Removido posicionamento absoluto */
-    }
-    .method-toggle-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid var(--border-color);
-        color: var(--text-color);
-        padding: 8px 16px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-family: var(--font-family);
-        font-weight: 600;
-        transition: all 0.3s ease;
-        min-width: 180px; /* Garante que não pule de tamanho */
-        text-align: center;
-    }
-    .method-toggle-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
+    
     .method-options {
         position: absolute;
         top: calc(100% + 8px);
@@ -245,11 +226,9 @@
         font-weight: 700;
     }
 
-
     .header {
       text-align: center;
-      margin-bottom: 24px; /* Ajustado */
-      /* Removido margin-top, pois o novo layout controla o espaçamento */
+      margin-bottom: 24px;
     }
 
     .header h1 {
@@ -260,16 +239,14 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin: 0;
-      display: none; /* Esconde o título de texto */
+      display: none;
     }
 
-    /* Novo estilo para a imagem do cabeçalho */
     .header img.main-logo {
-        max-width: 250px; /* Ajuste conforme necessário */
+        max-width: 250px;
         height: auto;
-        margin-bottom: 16px; /* Espaçamento abaixo da imagem */
+        margin-bottom: 16px;
     }
-
 
     .header .subtitle {
       font-size: 1rem;
@@ -277,7 +254,6 @@
       margin-top: 8px;
     }
     
-    /* === [NOVA ESTRUTURA] GAVETA DE CONTEXTO CLÍNICO (ESPECIALIDADES) === */
     .specialty-drawer {
         margin: 16px 0 24px;
         position: relative;
@@ -344,16 +320,14 @@
         font-weight: 700;
     }
 
-
-    /* Botões de Controle */
     .recorder-controls {
       text-align: center;
-      margin: 24px 0; /* Ajustado */
+      margin: 24px 0;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 16px;
-      flex-wrap: wrap; /* Permite que os botões quebrem a linha */
+      flex-wrap: wrap;
     }
 
     .recorder-controls button {
@@ -394,7 +368,6 @@
       height: 22px;
     }
 
-    /* === VISUALIZADOR DE ÁUDIO === */
     #audioVisualizer {
       display: block;
       width: 100%;
@@ -405,12 +378,10 @@
       border: 1px solid var(--border-color);
     }
 
-    /* Estilos específicos dos botões */
     #recordButton {
       background: linear-gradient(45deg, var(--accent-color-start), var(--accent-color-stop));
     }
 
-    /* [NOVO] Estilo para o botão de Reset */
     #resetButton {
       background-color: var(--info-color);
     }
@@ -428,7 +399,6 @@
       display: none !important;
     }
 
-    /* Status e Loader */
     #status {
       text-align: center;
       font-weight: 500;
@@ -471,13 +441,11 @@
         font-weight: 500;
     }
 
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    /* Seções de Saída */
     .output-section {
       margin-top: 24px;
     }
@@ -504,7 +472,6 @@
       color: #dcdcdc;
     }
 	
-	/* === ESTILOS PARA SEÇÃO DE CORREÇÃO === */
     #correctionsTextarea {
         width: 100%;
         box-sizing: border-box;
@@ -553,12 +520,11 @@
         transform: none;
     }
 
-    /* [NOVO] Estilo para o status de refinamento */
     #refineStatus {
         margin-top: 12px;
         font-size: 0.9rem;
         color: #b0b0b0;
-        min-height: 22px; /* Evita que o layout pule */
+        min-height: 22px;
     }
 
     .output-content .placeholder {
@@ -566,7 +532,6 @@
       font-style: italic;
     }
 
-    /* === [NOVO] ESTILOS PARA O MODAL DE HISTÓRICO === */
     #historyModal {
         max-width: 600px;
         width: 90%;
@@ -590,7 +555,7 @@
     #historyList {
         max-height: 50vh;
         overflow-y: auto;
-        padding-right: 10px; /* Espaço para a barra de rolagem */
+        padding-right: 10px;
     }
     .history-item {
         background: rgba(255, 255, 255, 0.05);
@@ -639,20 +604,6 @@
         color: white;
     }
 
-    /* === [AJUSTE] MEDIA QUERY PARA TELAS MENORES === */
-    @media (max-width: 550px) {
-      .method-toggle-btn, .history-btn, .theme-toggle-btn {
-        padding: 6px 10px;
-        font-size: 0.75rem; /* 12px */
-      }
-      .method-toggle-btn {
-        min-width: 0; /* Remove a largura mínima para se ajustar */
-      }
-      .right-header-controls {
-        gap: 8px; /* Reduz o espaço entre os botões da direita */
-      }
-    }
-
   </style>
 </head>
 <body class="theme-minty-pink">
@@ -668,19 +619,18 @@
         </div>
       </div>
       
-      <div class="right-header-controls">
-          <button class="history-btn" id="historyButton">Histórico</button>
-          <div class="theme-drawer">
-              <button class="theme-toggle-btn">Trocar tema</button>
-              <div class="theme-options hidden">
-                  <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
-                  <span class="theme-dot" data-theme="default" title="Padrão"></span>
-                  <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
-                  <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
-                  <span class="theme-dot" data-theme="forest" title="Floresta"></span>
-                  <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
-              </div>
-          </div>
+      <button class="history-btn" id="historyButton">Histórico</button>
+
+      <div class="theme-drawer">
+        <button class="theme-toggle-btn">Trocar tema</button>
+        <div class="theme-options hidden">
+          <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
+          <span class="theme-dot" data-theme="default" title="Padrão"></span>
+          <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
+          <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
+          <span class="theme-dot" data-theme="forest" title="Floresta"></span>
+          <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+        </div>
       </div>
     </div>
 
@@ -1041,21 +991,18 @@
         const savedSpecialty = localStorage.getItem('anamnesis_specialty') || 'none';
         applySpecialty(savedSpecialty);
         
-        // [NOVO] Adiciona listeners de eventos para o modal de histórico
         historyButton.addEventListener('click', displayHistory);
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
         historyListEl.addEventListener('click', loadConsultationFromHistory);
     });
     
-    // === [NOVO] FUNÇÕES DE HISTÓRICO ===
     function getHistory() {
         const historyJson = localStorage.getItem(CONSULTATION_HISTORY_KEY);
         return historyJson ? JSON.parse(historyJson) : [];
     }
 
     function saveConsultationToHistory() {
-        // Só salva se a consulta tiver sido completada e tiver transcrição
         const hasPlaceholder = transcriptionEl.querySelector('.placeholder');
         if (!isConsultationComplete || hasPlaceholder || !transcriptionEl.textContent.trim()) {
             return;
@@ -1074,13 +1021,13 @@
             improvements: improvementsEl.innerHTML
         };
 
-        history.unshift(newConsultation); // Adiciona no início (mais recente)
+        history.unshift(newConsultation);
         localStorage.setItem(CONSULTATION_HISTORY_KEY, JSON.stringify(history));
     }
 
     function displayHistory() {
         const history = getHistory();
-        historyListEl.innerHTML = ''; // Limpa a lista atual
+        historyListEl.innerHTML = '';
         if (history.length === 0) {
             historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta salva ainda.</p>';
         } else {
@@ -1114,7 +1061,7 @@
         const consultation = history.find(c => c.id === consultationId);
 
         if (consultation) {
-            resetApp(false); // Reseta a UI sem salvar a consulta atual (que já é uma do histórico)
+            resetApp(false);
 
             transcriptionEl.innerHTML = consultation.transcription;
             anamnesisEl.innerHTML = consultation.anamnesis;
@@ -1122,12 +1069,11 @@
             prescriptionSuggestionsEl.innerHTML = consultation.prescription;
             improvementsEl.innerHTML = consultation.improvements;
             timerDisplayEl.textContent = consultation.duration;
-            originalTranscriptionText = transcriptionEl.textContent; // Para permitir refinamento
+            originalTranscriptionText = transcriptionEl.textContent;
 
             applyMethod(consultation.method);
             applySpecialty(consultation.specialty);
 
-            // Mostra as seções relevantes
             refineSection.classList.remove('hidden');
             improvementSection.classList.remove('hidden');
             examsSection.classList.remove('hidden');
@@ -1144,12 +1090,10 @@
     function clearHistory() {
         if (confirm('Tem certeza que deseja apagar permanentemente todo o histórico de consultas? Esta ação não pode ser desfeita.')) {
             localStorage.removeItem(CONSULTATION_HISTORY_KEY);
-            displayHistory(); // Atualiza a exibição do modal (agora vazio)
+            displayHistory();
         }
     }
 
-
-    // === FUNÇÕES DO CONTADOR DE GRAVAÇÃO ===
     function formatTime(totalSeconds) {
         const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
         const seconds = (totalSeconds % 60).toString().padStart(2, '0');
@@ -1172,7 +1116,6 @@
         timerInterval = null;
     }
 
-    // === FUNÇÕES DE VISUALIZAÇÃO DE ÁUDIO ===
     function visualize(stream) {
         if (!audioContext || audioContext.state === 'closed') audioContext = new AudioContext();
         const source = audioContext.createMediaStreamSource(stream);
@@ -1209,7 +1152,6 @@
         canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, minVal, VELOCIDADE_ROLAGEM, amplitude);
     }
     
-    // === FUNÇÕES DO CONTADOR DE ESTIMATIVA ===
     function startEstimationCountdown(duration) {
       if (estimationInterval) clearInterval(estimationInterval);
       let timeLeft = duration;
@@ -1231,15 +1173,13 @@
       estimationTimerEl.textContent = '';
     }
 
-    // === LÓGICA PRINCIPAL DE GRAVAÇÃO E CONTROLES ===
     recordButton.addEventListener('click', startRecording);
     pauseButton.addEventListener('click', pauseRecording);
     resumeButton.addEventListener('click', resumeRecording);
     sendButton.addEventListener('click', stopAndSend);
     refineButton.addEventListener('click', handleRefinement);
-    resetButton.addEventListener('click', () => resetApp(true)); // [MODIFICADO] Passa 'true' para indicar que deve salvar
+    resetButton.addEventListener('click', () => resetApp(true));
 
-    // [FUNÇÃO MODIFICADA] para resetar o estado da aplicação
     function resetApp(saveCurrent = false) {
         if (saveCurrent) {
             saveConsultationToHistory();
@@ -1253,7 +1193,6 @@
         if (timerInterval) stopTimer();
         accumulatedTime = 0;
 
-        // Limpa todas as saídas e restaura placeholders
         const placeholderTranscription = '<span class="placeholder">A transcrição da conversa aparecerá aqui...</span>';
         const placeholderAnamnesis = '<span class="placeholder">A anamnese formatada aparecerá aqui...</span>';
         const placeholderExams = '<span class="placeholder">As sugestões de exames baseadas em evidências aparecerão aqui...</span>';
@@ -1266,29 +1205,24 @@
         prescriptionSuggestionsEl.innerHTML = placeholderPrescription;
         improvementsEl.innerHTML = placeholderImprovements;
         
-        // Esconde seções
         refineSection.classList.add('hidden');
         improvementSection.classList.add('hidden');
         examsSection.classList.add('hidden');
         prescriptionSection.classList.add('hidden');
         timerDisplayEl.classList.add('hidden');
         
-        // Reseta status
         statusEl.textContent = 'Clique no botão "Gravar Consulta" para iniciar.';
         correctionsTextarea.value = '';
         refineStatusEl.textContent = '';
 
-        // Atualiza a UI dos botões para o estado inicial
         updateButtonsUI();
     }
 
 
     async function startRecording() {
-      // Se não for uma continuação, limpa tudo.
       if (!isConsultationComplete) {
-        resetApp(false); // Usa a função de reset para garantir um estado limpo
+        resetApp(false);
       } else {
-        // Se for continuação, apenas prepara para nova gravação sem limpar a tela
         audioChunks = [];
         statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
       }
@@ -1300,7 +1234,6 @@
         mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
         mediaRecorder.onstop = processAudio;
         
-        // Zera o timer para a nova gravação
         accumulatedTime = 0; 
         startTimer();
         
@@ -1382,8 +1315,6 @@
         sendButton.disabled = false;
       }
     }
-
-    // === LÓGICA DE CHAMADA À API E REFINAMENTO ===
 
     async function callGeminiAPI(audioBase64, mimeType) {
         const selectedPreset = specialtyPresets[selectedSpecialty];
@@ -1689,8 +1620,6 @@
         }
     }
 
-
-    // === FUNÇÕES AUXILIARES ===
     function blobToBase64(blob) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1704,25 +1633,21 @@
         catch (e) { console.error('Erro no parse da resposta da API', e, json); return 'Erro ao extrair texto da resposta.'; }
     }
     
-    // [FUNÇÃO ALTERADA] para gerenciar o novo estado e o botão de reset
     function updateButtonsUI() {
         if (!isRecording) {
-            // Não está gravando
             recordButton.classList.remove('hidden');
             pauseButton.classList.add('hidden');
             resumeButton.classList.add('hidden');
             sendButton.classList.add('hidden');
             
-            // Lógica para mostrar/esconder o botão de reset
             if (isConsultationComplete) {
                 resetButton.classList.remove('hidden');
-                recordButton.querySelector('span').textContent = 'Gravar Adicional'; // Muda o texto do botão
+                recordButton.querySelector('span').textContent = 'Gravar Adicional';
             } else {
                 resetButton.classList.add('hidden');
-                recordButton.querySelector('span').textContent = 'Gravar Consulta'; // Garante o texto original
+                recordButton.querySelector('span').textContent = 'Gravar Consulta';
             }
         } else {
-            // Está gravando
             recordButton.classList.add('hidden');
             resetButton.classList.add('hidden');
             sendButton.classList.remove('hidden');
