@@ -1,0 +1,1354 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AnamneseAI | Assistente de Anamnese</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Tema Padrão Antigo (Roxo/Azul) */
+      --primary-color: #6a11cb;
+      --secondary-color: #2575fc;
+      --accent-color-start: #ff416c;
+      --accent-color-stop: #ff4b2b;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --text-color: #e0e0e0;
+      --background-color-main: #121212;
+      --background-color-card: rgba(30, 30, 30, 0.7);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --font-family: 'Poppins', sans-serif;
+    }
+
+    /* === NOVOS TEMAS === */
+    /* NOVO TEMA PRINCIPAL (Verde/Rosa) */
+    body.theme-minty-pink {
+        --primary-color: #009195;
+        --secondary-color: #5ff4ab;
+        --accent-color-start: #ff14a9;
+        --accent-color-stop: #ff14a9; /* Cor sólida conforme solicitado */
+    }
+    /* Para o novo tema, botões de ação principais também usam a cor de destaque */
+    body.theme-minty-pink #refineButton,
+    body.theme-minty-pink #sendButton {
+        background: var(--accent-color-start);
+    }
+
+
+    /* Tema Pôr do Sol */
+    body.theme-sunset {
+        --primary-color: #d35400;
+        --secondary-color: #e67e22;
+        --accent-color-start: #e74c3c;
+        --accent-color-stop: #f1c40f;
+    }
+    /* Tema Oceano */
+    body.theme-ocean {
+        --primary-color: #005aa7;
+        --secondary-color: #00c6ff;
+        --accent-color-start: #ffc107;
+        --accent-color-stop: #ff8c00;
+        --success-color: #20c997;
+        --warning-color: #fd7e14;
+    }
+    /* Tema Floresta */
+    body.theme-forest {
+        --primary-color: #134e5e;
+        --secondary-color: #71b280;
+        --accent-color-start: #a8ff78;
+        --accent-color-stop: #78ffd6;
+        --success-color: #28a745;
+        --text-color: #f0f0f0;
+    }
+    /* Tema Rosa Escuro */
+    body.theme-dark-rose {
+        --primary-color: #e83e8c;
+        --secondary-color: #6f42c1;
+        --accent-color-start: #f54ea2;
+        --accent-color-stop: #ff7676;
+        --success-color: #17a2b8;
+        --border-color: rgba(255, 255, 255, 0.15);
+    }
+
+
+    /* Estilos Gerais */
+    body {
+      font-family: var(--font-family);
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+      margin: 0;
+      box-sizing: border-box;
+      transition: background 0.5s ease;
+    }
+
+    .container {
+      position: relative; /* Essencial para posicionar elementos filhos */
+      width: 100%;
+      max-width: 800px;
+      background: var(--background-color-card);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 32px 40px;
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    /* === [NOVO] ESTILO PARA O TEXTO DE CRÉDITO === */
+    .creator-credit {
+        position: absolute;
+        bottom: 10px; /* Movido para baixo */
+        left: 50%; /* Centralizado */
+        transform: translateX(-50%); /* Centralizado */
+        font-size: 0.75rem; /* 12px */
+        color: var(--text-color);
+        opacity: 0.6;
+        font-weight: 400;
+        z-index: 5;
+    }
+    
+    /* === SELETOR DE TEMAS ESTILO GAVETA (MODIFICADO) === */
+    .theme-drawer {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        z-index: 10;
+    }
+
+    .theme-toggle-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: var(--font-family);
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .theme-options {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: var(--background-color-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .theme-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .theme-dot:hover {
+        transform: scale(1.2);
+    }
+
+    .theme-dot.active {
+        border-color: #ffffff;
+        transform: scale(1.25);
+    }
+
+    .theme-dot[data-theme="minty-pink"] { background: linear-gradient(135deg, #009195 0%, #5ff4ab 100%); }
+    .theme-dot[data-theme="default"] { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
+    .theme-dot[data-theme="sunset"] { background: linear-gradient(135deg, #d35400 0%, #e67e22 100%); }
+    .theme-dot[data-theme="ocean"] { background: linear-gradient(135deg, #005aa7 0%, #00c6ff 100%); }
+    .theme-dot[data-theme="forest"] { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
+    .theme-dot[data-theme="dark-rose"] { background: linear-gradient(135deg, #e83e8c 0%, #6f42c1 100%); }
+
+    /* === [NOVO] SELETOR DE MÉTODO DE ANAMNESE === */
+    .method-drawer {
+        position: absolute;
+        top: 24px;
+        left: 24px;
+        z-index: 10;
+    }
+    .method-toggle-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: var(--font-family);
+        font-weight: 600;
+        transition: background 0.3s ease;
+        min-width: 180px; /* Garante que não pule de tamanho */
+        text-align: center;
+    }
+    .method-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    .method-options {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background: var(--background-color-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        width: 100%;
+    }
+    .method-option {
+        padding: 10px 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    .method-option:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .method-option.active {
+        background-color: var(--secondary-color);
+        color: #111;
+        font-weight: 700;
+    }
+
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px; /* Ajustado */
+      margin-top: 48px; /* Adicionado para não sobrepor os botões */
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: -webkit-linear-gradient(45deg, var(--accent-color-start), var(--accent-color-stop));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      display: none; /* Esconde o título de texto */
+    }
+
+    /* Novo estilo para a imagem do cabeçalho */
+    .header img.main-logo {
+        max-width: 250px; /* Ajuste conforme necessário */
+        height: auto;
+        margin-bottom: 16px; /* Espaçamento abaixo da imagem */
+    }
+
+
+    .header .subtitle {
+      font-size: 1rem;
+      color: #b0b0b0;
+      margin-top: 8px;
+    }
+    
+    /* === [NOVA ESTRUTURA] GAVETA DE CONTEXTO CLÍNICO (ESPECIALIDADES) === */
+    .specialty-drawer {
+        margin: 16px 0 24px;
+        position: relative;
+        z-index: 9;
+    }
+    .specialty-drawer label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-color);
+        opacity: 0.9;
+        padding-left: 4px;
+        margin-bottom: 8px;
+    }
+    .specialty-toggle-btn {
+        width: 100%;
+        box-sizing: border-box;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 12px 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-family: var(--font-family);
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        text-align: left;
+    }
+    .specialty-toggle-btn:hover {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 10px rgba(var(--secondary-color), 0.3);
+    }
+    .specialty-options {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: var(--background-color-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        max-height: 250px;
+        overflow-y: auto;
+    }
+    .specialty-option {
+        padding: 10px 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    .specialty-option:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .specialty-option.active {
+        background-color: var(--secondary-color);
+        color: #111;
+        font-weight: 700;
+    }
+
+
+    /* Botões de Controle */
+    .recorder-controls {
+      text-align: center;
+      margin: 24px 0; /* Ajustado */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .recorder-controls button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .recorder-controls button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .recorder-controls button:active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .recorder-controls button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .recorder-controls button svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* === VISUALIZADOR DE ÁUDIO === */
+    #audioVisualizer {
+      display: block;
+      width: 100%;
+      height: 100px;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      margin: 24px auto 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Estilos específicos dos botões */
+    #recordButton {
+      background: linear-gradient(45deg, var(--accent-color-start), var(--accent-color-stop));
+    }
+
+    #pauseButton, #resumeButton {
+      background-color: var(--warning-color);
+      color: #111;
+    }
+
+    #sendButton {
+      background-color: var(--success-color);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Status e Loader */
+    #status {
+      text-align: center;
+      font-weight: 500;
+      min-height: 24px;
+      color: #b0b0b0;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    #timerDisplay {
+        text-align: center;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin: 16px 0 -8px 0;
+        font-family: 'monospace', sans-serif;
+    }
+
+    .loader-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      color: var(--text-color);
+    }
+
+    .loader {
+      border: 4px solid var(--border-color);
+      border-top: 4px solid var(--secondary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    #estimationTimer {
+        font-size: 0.9rem;
+        color: #b0b0b0;
+        font-weight: 500;
+    }
+
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Seções de Saída */
+    .output-section {
+      margin-top: 24px;
+    }
+
+    .output-section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-color);
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+
+    .output-content {
+      background-color: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      white-space: pre-wrap;
+      font-family: 'Poppins', sans-serif;
+      min-height: 120px;
+      line-height: 1.7;
+      color: #dcdcdc;
+    }
+	
+	/* === ESTILOS PARA SEÇÃO DE CORREÇÃO === */
+    #correctionsTextarea {
+        width: 100%;
+        box-sizing: border-box;
+        height: 120px;
+        resize: vertical;
+        background-color: rgba(0, 0, 0, 0.25);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        color: var(--text-color);
+        font-family: var(--font-family);
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    #correctionsTextarea:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 10px rgba(var(--secondary-color), 0.3);
+    }
+
+    .refine-controls {
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    #refineButton {
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    #refineButton:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    #refineButton:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* [NOVO] Estilo para o status de refinamento */
+    #refineStatus {
+        margin-top: 12px;
+        font-size: 0.9rem;
+        color: #b0b0b0;
+        min-height: 22px; /* Evita que o layout pule */
+    }
+
+    .output-content .placeholder {
+      color: #777;
+      font-style: italic;
+    }
+
+      </style>
+</head>
+<body class="theme-minty-pink">
+
+  <div class="container">
+    
+    <div class="method-drawer">
+      <button class="method-toggle-btn">Método: Tradicional</button>
+      <div class="method-options hidden">
+        <div class="method-option active" data-method="tradicional">Anamnese Tradicional</div>
+        <div class="method-option" data-method="soap">Prontuário S.O.A.P.</div>
+      </div>
+    </div>
+    
+    <div class="theme-drawer">
+      <button class="theme-toggle-btn">Trocar tema</button>
+      <div class="theme-options hidden">
+        <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
+        <span class="theme-dot" data-theme="default" title="Padrão"></span>
+        <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
+        <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
+        <span class="theme-dot" data-theme="forest" title="Floresta"></span>
+        <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+      </div>
+    </div>
+
+    <div class="header">
+      <img src="https://cdn.shopify.com/s/files/1/0830/2385/5932/files/Untitled_design_6.png?v=1759647321" alt="Sanus IA Logo" class="main-logo">
+      <h1 style="display: none;">Sanus IA</h1>      <p class="subtitle">Sua consulta gravada, seu prontuário estruturado em segundos.</p>
+    </div>
+
+    <div class="specialty-drawer">
+        <label>Contexto Clínico / Fontes</label>
+        <button class="specialty-toggle-btn">Nenhuma (Padrão)</button>
+        <div class="specialty-options hidden">
+        </div>
+    </div>
+
+    <div class="recorder-controls">
+      <button id="recordButton">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"></path><path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"></path></svg>
+        <span>Gravar Consulta</span>
+      </button>
+
+      <button id="pauseButton" class="hidden">
+       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
+        <span>Pausar</span>
+      </button>
+      <button id="resumeButton" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+        <span>Retomar</span>
+      </button>
+      <button id="sendButton" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-send-fill"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg>
+        <span>Analisar Gravação</span>
+      </button>
+    </div>
+
+    <canvas id="audioVisualizer" width="720" height="100" class="hidden"></canvas>
+
+    <p id="timerDisplay" class="hidden">00:00</p>
+
+    <p id="status">Clique no botão "Gravar Consulta" para iniciar.</p>
+
+    <div id="loader" class="loader-wrapper hidden">
+      <div class="loader"></div>
+      <p>Analisando o áudio com a IA...</p>
+      <p id="estimationTimer"></p>
+    </div>
+
+    <div class="output-section">
+      <h2>Transcrição da Consulta</h2>
+      <div id="transcription" class="output-content">
+        <span class="placeholder">A transcrição da conversa aparecerá aqui...</span>
+      </div>
+    </div>
+
+    <div id="refineSection" class="output-section hidden">
+        <h2>Correções e Adições Manuais</h2>
+        <textarea id="correctionsTextarea" placeholder="Se a transcrição contiver erros, digite as correções ou informações adicionais aqui... Por exemplo: 'O paciente mencionou febre de 38.5 graus, não 37.5.'"></textarea>
+        <div class="refine-controls">
+            <button id="refineButton">Refazer Prontuário com Correções</button>
+            <p id="refineStatus"></p>
+        </div>
+    </div>
+
+
+    <div class="output-section">
+      <h2 id="anamnesisTitle">Prontuário / Anamnese Estruturada</h2>
+      <div id="anamnesis" class="output-content">
+        <span class="placeholder">A anamnese formatada aparecerá aqui...</span>
+      </div>
+    </div>
+
+    <div id="improvementSection" class="output-section hidden">
+      <h2>Pontos a Melhorar/Acrescentar</h2>
+      <div id="improvements" class="output-content">
+        <span class="placeholder">Sugestões para aprimoramento da consulta aparecerão aqui...</span>
+      </div>
+    </div>
+
+    <div class="creator-credit"><strong>Feito por:</strong> João Victor Leão </div>
+  </div>
+
+  <script>
+  (function(){
+    // === CONFIGURAÇÃO (NÃO ALTERADA) ===
+    const GEMINI_API_KEY = 'AIzaSyAPfkx1oy28ZG8U3jfTdGuCENLhb6tG_DQ';
+    const MODEL = 'gemini-2.5-flash';
+    const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    const VELOCIDADE_ROLAGEM = 4;
+
+    // === ELEMENTOS DA PÁGINA ===
+    const recordButton = document.getElementById('recordButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const resumeButton = document.getElementById('resumeButton');
+    const sendButton = document.getElementById('sendButton');
+    const statusEl = document.getElementById('status');
+    const transcriptionEl = document.getElementById('transcription');
+    const anamnesisEl = document.getElementById('anamnesis');
+    const loader = document.getElementById('loader');
+    const visualizerCanvas = document.getElementById('audioVisualizer');
+    const canvasCtx = visualizerCanvas.getContext('2d');
+    const timerDisplayEl = document.getElementById('timerDisplay');
+    const estimationTimerEl = document.getElementById('estimationTimer');
+    const refineSection = document.getElementById('refineSection');
+    const correctionsTextarea = document.getElementById('correctionsTextarea');
+    const refineButton = document.getElementById('refineButton');
+    const refineStatusEl = document.getElementById('refineStatus');
+    const anamnesisTitleEl = document.getElementById('anamnesisTitle');
+    const improvementSection = document.getElementById('improvementSection');
+    const improvementsEl = document.getElementById('improvements');
+
+
+    // === VARIÁVEIS DE ESTADO ===
+    let isRecording = false;
+    let isPaused = false;
+    let mediaRecorder;
+    let audioChunks = [];
+    let audioContext;
+    let analyser;
+    let animationFrameId;
+    let dataArray;
+    let bufferLength;
+    let timerInterval = null;
+    let startTime = 0;
+    let accumulatedTime = 0;
+    let estimationInterval = null;
+    let estimatedProcessTime = 0;
+    let processingStartTime = 0;
+    let originalTranscriptionText = '';
+    let anamnesisMethod = 'tradicional';
+
+
+    // === LÓGICA DE TEMAS ===
+    const themeDrawer = document.querySelector('.theme-drawer');
+    const themeToggleButton = document.querySelector('.theme-toggle-btn');
+    const themeOptions = document.querySelector('.theme-options');
+    const themeDots = document.querySelectorAll('.theme-dot');
+    const bodyEl = document.body;
+
+    function applyTheme(themeName) {
+        bodyEl.className = '';
+        if (themeName !== 'default') {
+            bodyEl.classList.add(`theme-${themeName}`);
+        }
+        if (themeName === 'minty-pink') {
+            bodyEl.classList.add('theme-minty-pink');
+        }
+
+        themeDots.forEach(dot => {
+            dot.classList.remove('active');
+            if (dot.dataset.theme === themeName) {
+                dot.classList.add('active');
+            }
+        });
+        localStorage.setItem('anamnesis_theme', themeName);
+    }
+    themeToggleButton.addEventListener('click', () => themeOptions.classList.toggle('hidden'));
+    themeOptions.addEventListener('click', (e) => {
+        if (e.target.classList.contains('theme-dot')) {
+            applyTheme(e.target.dataset.theme);
+            themeOptions.classList.add('hidden');
+        }
+    });
+    
+    // === LÓGICA DE MÉTODO DE ANAMNESE ===
+    const methodDrawer = document.querySelector('.method-drawer');
+    const methodToggleButton = document.querySelector('.method-toggle-btn');
+    const methodOptionsContainer = document.querySelector('.method-options');
+    const methodOptions = document.querySelectorAll('.method-option');
+
+    function applyMethod(method) {
+        anamnesisMethod = method;
+        methodOptions.forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.method === method);
+        });
+
+        if (method === 'tradicional') {
+            methodToggleButton.textContent = 'Método: Tradicional';
+            anamnesisTitleEl.textContent = 'Prontuário / Anamnese Estruturada';
+        } else if (method === 'soap') {
+            methodToggleButton.textContent = 'Método: S.O.A.P.';
+            anamnesisTitleEl.textContent = 'Prontuário Estruturado (S.O.A.P.)';
+        }
+        localStorage.setItem('anamnesis_method', method);
+    }
+    methodToggleButton.addEventListener('click', () => methodOptionsContainer.classList.toggle('hidden'));
+    methodOptionsContainer.addEventListener('click', (e) => {
+        const targetOption = e.target.closest('.method-option');
+        if (targetOption) {
+            applyMethod(targetOption.dataset.method);
+            methodOptionsContainer.classList.add('hidden');
+        }
+    });
+
+    // === [NOVO] LÓGICA DO CONTEXTO CLÍNICO (ESPECIALIDADES) ===
+    const specialtyDrawer = document.querySelector('.specialty-drawer');
+    const specialtyToggleButton = document.querySelector('.specialty-toggle-btn');
+    const specialtyOptionsContainer = document.querySelector('.specialty-options');
+
+    const specialtyPresets = {
+        'none': {
+            displayName: 'Nenhuma (Padrão)',
+            sources: []
+        },
+        'mfc': {
+            displayName: 'Medicina de Família e Comunidade',
+            sources: [
+                'https://bvsms.saude.gov.br/bvs/publicacoes/manual_tecnico_controle_tuberculose_cab6.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/violencia_intrafamiliar_cab8.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/dermatologia_atencao_basica_saude_cab9.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/guia_controle_hanseniase_cab10.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/controle_canceres_colo_utero_2013.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/abcad14.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_bucal.pdf',
+                'https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/svsa/atencao-basica/cadernos-de-atencao-basica-18.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/abcad19.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_carencias_micronutrientes.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/cab_n21_vigilancia_saude_2ed_p1.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/vigilancia_saude_zoonoses_p1.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_crianca_aleitamento_materno_cab23.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_24.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/doencas_respiratorias_cronicas.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_sexual_saude_reprodutiva.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/caderno_atencao_basica_diretrizes_nasf.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/acolhimento_demanda_espontanea_cab28v1.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/caderno_atencao_primaria_29_rastreamento.pdf',
+                'https://biblioteca.cofen.gov.br/wp-content/uploads/2016/07/Caderno-de-aten%C3%A7%C3%A3o-prim%C3%A1ria-n30-procedimentos.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/praticas_integrativas_complementares_plantas_medicinais_cab31.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_32_prenatal.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_crianca_crescimento_desenvolvimento.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_34_saude_mental.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_pessoa_doenca_cronica_cab35.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_pessoa_diabetes_mellitus_cab36.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/hipertensao_arterial_sistemica_cab37.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_doenca_cronica_obesidade_cab38.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/nucleo_apoio_saude_familia_cab39.pdf',
+                'https://biblioteca.cofen.gov.br/wp-content/uploads/2017/01/Estrat%C3%A9gias-para-o-cuidado-da-pessoa-com-doen%C3%A7a-cr%C3%B4nica-o-cuidado-da-pessoa-tabagista.pdf',
+                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_trabalhador_trabalhadora.pdf'
+            ]
+        },
+        'clinica_medica': {
+            displayName: 'Clínica Médica (Hospitalar)',
+            sources: []
+        },
+        'cardiologia': {
+            displayName: 'Cardiologia',
+            sources: []
+        },
+        'endocrinologia': {
+            displayName: 'Endocrinologia',
+            sources: []
+        },
+        'pediatria': {
+            displayName: 'Pediatria',
+            sources: []
+        }
+    };
+    let selectedSpecialty = 'none';
+
+    function applySpecialty(specialtyKey) {
+        if (!specialtyPresets[specialtyKey]) return;
+        selectedSpecialty = specialtyKey;
+        const specialty = specialtyPresets[specialtyKey];
+        specialtyToggleButton.textContent = specialty.displayName;
+        const options = specialtyOptionsContainer.querySelectorAll('.specialty-option');
+        options.forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.specialty === specialtyKey);
+        });
+        localStorage.setItem('anamnesis_specialty', specialtyKey);
+    }
+
+    function populateSpecialties() {
+        specialtyOptionsContainer.innerHTML = '';
+        for (const key in specialtyPresets) {
+            const option = document.createElement('div');
+            option.className = 'specialty-option';
+            option.dataset.specialty = key;
+            option.textContent = specialtyPresets[key].displayName;
+            specialtyOptionsContainer.appendChild(option);
+        }
+    }
+
+    specialtyToggleButton.addEventListener('click', () => specialtyOptionsContainer.classList.toggle('hidden'));
+    specialtyOptionsContainer.addEventListener('click', (e) => {
+        const targetOption = e.target.closest('.specialty-option');
+        if (targetOption) {
+            applySpecialty(targetOption.dataset.specialty);
+            specialtyOptionsContainer.classList.add('hidden');
+        }
+    });
+
+    // Evento unificado para fechar gavetas ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!themeDrawer.contains(e.target) && !themeOptions.classList.contains('hidden')) {
+            themeOptions.classList.add('hidden');
+        }
+        if (!methodDrawer.contains(e.target) && !methodOptionsContainer.classList.contains('hidden')) {
+            methodOptionsContainer.classList.add('hidden');
+        }
+        if (!specialtyDrawer.contains(e.target) && !specialtyOptionsContainer.classList.contains('hidden')) {
+            specialtyOptionsContainer.classList.add('hidden');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('anamnesis_theme') || 'minty-pink';
+        applyTheme(savedTheme);
+        const savedMethod = localStorage.getItem('anamnesis_method') || 'tradicional';
+        applyMethod(savedMethod);
+        
+        populateSpecialties();
+        const savedSpecialty = localStorage.getItem('anamnesis_specialty') || 'none';
+        applySpecialty(savedSpecialty);
+    });
+    
+    // === FUNÇÕES DO CONTADOR DE GRAVAÇÃO ===
+    function formatTime(totalSeconds) {
+        const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${minutes}:${seconds}`;
+    }
+    function updateTimer() {
+        const elapsedTimeSinceStart = Date.now() - startTime;
+        const totalElapsedTime = accumulatedTime + elapsedTimeSinceStart;
+        const totalSeconds = Math.floor(totalElapsedTime / 1000);
+        timerDisplayEl.textContent = formatTime(totalSeconds);
+    }
+    function startTimer() {
+        timerDisplayEl.classList.remove('hidden');
+        startTime = Date.now();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    // === FUNÇÕES DE VISUALIZAÇÃO DE ÁUDIO ===
+    function visualize(stream) {
+        if (!audioContext || audioContext.state === 'closed') audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+        source.connect(analyser);
+        const bodyStyles = window.getComputedStyle(bodyEl);
+        const bgColor = bodyStyles.getPropertyValue('--background-color-card');
+        canvasCtx.fillStyle = bgColor;
+        canvasCtx.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+        visualizerCanvas.classList.remove('hidden');
+        drawWave();
+    }
+    function drawWave() {
+        animationFrameId = requestAnimationFrame(drawWave);
+        canvasCtx.drawImage(visualizerCanvas, -VELOCIDADE_ROLAGEM, 0);
+        analyser.getByteTimeDomainData(dataArray);
+        let min = 128, max = 128;
+        for (let i = 0; i < bufferLength; i++) {
+            if (dataArray[i] < min) min = dataArray[i];
+            if (dataArray[i] > max) max = dataArray[i];
+        }
+        const minVal = (min / 255) * visualizerCanvas.height;
+        const maxVal = (max / 255) * visualizerCanvas.height;
+        const amplitude = Math.max(1, maxVal - minVal);
+        const bodyStyles = window.getComputedStyle(bodyEl);
+        const bgColor = bodyStyles.getPropertyValue('--background-color-card');
+        const waveColor = bodyStyles.getPropertyValue('--secondary-color');
+        canvasCtx.fillStyle = bgColor;
+        canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, 0, VELOCIDADE_ROLAGEM, visualizerCanvas.height);
+        canvasCtx.fillStyle = waveColor.trim();
+        canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, minVal, VELOCIDADE_ROLAGEM, amplitude);
+    }
+    
+    // === FUNÇÕES DO CONTADOR DE ESTIMATIVA ===
+    function startEstimationCountdown(duration) {
+      if (estimationInterval) clearInterval(estimationInterval);
+      let timeLeft = duration;
+      function update() {
+        if (timeLeft <= 0) {
+          estimationTimerEl.textContent = "A finalização pode levar mais alguns instantes...";
+          clearInterval(estimationInterval);
+        } else {
+          estimationTimerEl.textContent = `Tempo estimado restante: ~${timeLeft} segundos...`;
+          timeLeft--;
+        }
+      }
+      update(); 
+      estimationInterval = setInterval(update, 1000);
+    }
+    function stopEstimationCountdown() {
+      clearInterval(estimationInterval);
+      estimationInterval = null;
+      estimationTimerEl.textContent = '';
+    }
+
+    // === LÓGICA PRINCIPAL DE GRAVAÇÃO ===
+    recordButton.addEventListener('click', startRecording);
+    pauseButton.addEventListener('click', pauseRecording);
+    resumeButton.addEventListener('click', resumeRecording);
+    sendButton.addEventListener('click', stopAndSend);
+    refineButton.addEventListener('click', handleRefinement);
+
+
+    async function startRecording() {
+      transcriptionEl.innerHTML = '<span class="placeholder">Aguardando transcrição...</span>';
+      anamnesisEl.innerHTML = '<span class="placeholder">Aguardando anamnese...</span>';
+      improvementsEl.innerHTML = '<span class="placeholder">Sugestões para aprimoramento da consulta aparecerão aqui...</span>';
+      refineSection.classList.add('hidden');
+      improvementSection.classList.add('hidden');
+      correctionsTextarea.value = '';
+      refineStatusEl.textContent = ''; // Limpa o status de refinamento
+      audioChunks = [];
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        visualize(stream);
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+        mediaRecorder.onstop = processAudio;
+        accumulatedTime = 0;
+        startTimer();
+        mediaRecorder.start();
+        isRecording = true;
+        updateButtonsUI();
+        statusEl.textContent = 'Gravando... Fale agora.';
+      } catch (err) {
+        console.error("Erro ao acessar o microfone:", err);
+        statusEl.textContent = 'Erro! Não foi possível acessar o microfone. Verifique as permissões.';
+      }
+    }
+    function pauseRecording() {
+        if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+        mediaRecorder.pause();
+        cancelAnimationFrame(animationFrameId);
+        stopTimer();
+        accumulatedTime += Date.now() - startTime;
+        isPaused = true;
+        updateButtonsUI();
+        statusEl.textContent = 'Gravação pausada.';
+    }
+    function resumeRecording() {
+        if (!mediaRecorder || mediaRecorder.state !== 'paused') return;
+        mediaRecorder.resume();
+        startTimer();
+        isPaused = false;
+        drawWave();
+        updateButtonsUI();
+        statusEl.textContent = 'Gravando...';
+    }
+    function stopAndSend() {
+      if (mediaRecorder && isRecording) {
+            stopTimer();
+            if (!isPaused) accumulatedTime += Date.now() - startTime;
+            const totalDurationSeconds = Math.floor(accumulatedTime / 1000);
+            const formattedTime = formatTime(totalDurationSeconds);
+            timerDisplayEl.textContent = formattedTime;
+            mediaRecorder.stop();
+            cancelAnimationFrame(animationFrameId);
+            visualizerCanvas.classList.add('hidden');
+            if (audioContext && audioContext.state !== 'closed') audioContext.close();
+            if (mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            isRecording = false;
+            isPaused = false;
+            updateButtonsUI();
+            let lowerBound, upperBound;
+            if (totalDurationSeconds < 15) {
+                lowerBound = 5;
+                upperBound = 10;
+            } else {
+                lowerBound = Math.max(5, Math.ceil(totalDurationSeconds * 0.20));
+                upperBound = Math.max(8, Math.ceil(totalDurationSeconds * 0.35));
+            }
+            estimatedProcessTime = Math.ceil((lowerBound + upperBound) / 2);
+            statusEl.innerHTML = `Gravação de <strong>${formattedTime}</strong> finalizada. Processando...`;
+      }
+    }
+
+    async function processAudio() {
+      processingStartTime = Date.now();
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      loader.classList.remove('hidden');
+      statusEl.classList.add('hidden');
+      sendButton.disabled = true;
+      startEstimationCountdown(estimatedProcessTime);
+      try {
+        const audioBase64 = await blobToBase64(audioBlob);
+        await callGeminiAPI(audioBase64, 'audio/webm');
+      } catch(err) {
+        console.error("Erro ao processar o áudio ou chamar a API:", err);
+        statusEl.textContent = `Erro no processamento: ${err.message}`;
+        anamnesisEl.innerHTML = '<span class="placeholder">Falha ao gerar a anamnese. Verifique o console.</span>';
+      } finally {
+        loader.classList.add('hidden');
+        statusEl.classList.remove('hidden');
+        sendButton.disabled = false;
+        updateButtonsUI();
+        stopEstimationCountdown();
+      }
+    }
+
+    // === LÓGICA DE CHAMADA À API E REFINAMENTO ===
+
+    async function callGeminiAPI(audioBase64, mimeType) {
+        const selectedPreset = specialtyPresets[selectedSpecialty];
+        let sourceInstruction = '';
+
+        if (selectedPreset && selectedPreset.sources.length > 0) {
+            const sourceList = selectedPreset.sources.map(s => `- ${s}`).join('\n');
+            sourceInstruction = `
+            \n\n**DIRETRIZ ADICIONAL PARA PLANO TERAPÊUTICO E MELHORIAS:**
+            Baseie sua sugestão de plano terapêutico e os pontos de melhoria **prioritariamente** nas informações contidas na(s) fonte(s) mais relevante(s) da lista abaixo, que pertence ao contexto de "${selectedPreset.displayName}".
+            
+            **Fontes Confiáveis Pré-selecionadas:**
+            ${sourceList}
+            `;
+        } else {
+            sourceInstruction = `
+            \n\n**DIRETRIZ ADICIONAL PARA PLANO TERAPÊUTICO E MELHORIAS:**
+            Crie um plano terapêutico e sugestões de melhoria baseados nas diretrizes atuais de maior evidência científica para o caso apresentado.
+            `;
+        }
+        
+        let anamnesisFormat;
+        if (anamnesisMethod === 'soap') {
+            anamnesisFormat = `
+            **Gere o prontuário usando estritamente o formato S.O.A.P.:**
+            <strong>S (Subjetivo):</strong> Compile aqui tudo o que o paciente relata.
+            <strong>O (Objetivo):</strong> Liste aqui apenas informações objetivas. Se não houver, indique "Nenhuma informação objetiva fornecida.".
+            <strong>A (Avaliação):</strong> Apresente a(s) hipótese(s) diagnóstica(s) (HD).
+            <strong>P (Plano):</strong> Descreva o plano de ação. Para cada item, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
+            <strong>Fonte do Plano:</strong> [OBRIGATÓRIO: Cite aqui a(s) fonte(s) COMPLETA(S) usada(s) para basear o plano terapêutico]
+            `;
+        } else { // Método Tradicional
+            anamnesisFormat = `
+            **Formato da Anamnese:**
+            <strong>Identificação do Paciente:</strong>
+            <strong>Queixa Principal (QP):</strong>
+            <strong>História da Doença Atual (HDA):</strong>
+            <strong>Revisão de Sistemas:</strong>
+            <strong>História Médica Pregressa (HMP):</strong>
+            <strong>História Familiar (HF):</strong>
+            <strong>História Social e Hábitos de Vida (HSHV):</strong>
+            <strong>Hipóteses Diagnósticas (HD):</strong>
+            <strong>Plano Terapêutico Sugerido:</strong> Para cada item do plano, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
+            <strong>Fonte da Sugestão Terapêutica:</strong> [OBRIGATÓRIO: Cite aqui a(s) fonte(s) COMPLETA(S) usada(s) para basear o plano terapêutico]
+            `;
+        }
+
+        const prompt = `
+          Você é um assistente médico altamente qualificado. Sua tarefa é analisar o áudio de uma consulta médica.
+          Execute as seguintes tarefas, em ordem:
+
+          1.  **Transcrever a Conversa:**
+              * Transcreva a conversa na íntegra, identificando <strong>Doutor:</strong> e <strong>Paciente:</strong>.
+              * Apresente a transcrição completa sob o título "--- TRANSCRIÇÃO ---".
+
+          2.  **Estruturar a Anamnese/Prontuário:**
+              * Com base na transcrição, estruture um prontuário médico completo e profissional, seguindo o formato solicitado.
+              * Separe a transcrição do prontuário com o título "--- ANAMNESE ESTRUTURADA ---".
+
+          3.  **Analisar Pontos de Melhoria:**
+              * Com base **exclusivamente** na lista de fontes de referência fornecida, analise a transcrição e identifique tópicos ou perguntas que o médico **não abordou**, mas que seriam relevantes.
+              * Liste cada ponto de melhoria em formato de tópico (usando hífens).
+              * **Após cada item**, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia). Exemplo: (Fonte: Pág. 72, CAB nº32).
+              * Ao final de todos os pontos, adicione um item <strong>Fontes das Sugestões de Melhoria:</strong> e liste a(s) referência(s) completa(s) que você usou.
+              * Se nenhuma melhoria for identificada, escreva "Nenhum ponto de melhoria específico foi identificado com base nas informações fornecidas.".
+              * Apresente esta análise sob o título "--- PONTOS DE MELHORIA ---".
+
+          **REGRAS DE FORMATAÇÃO (MUITO IMPORTANTE):**
+          * **Negrito:** Use exclusivamente a tag HTML <strong>Negrito</strong>. **NUNCA** use asteriscos (**).
+          * **Estrutura:** Organize o texto de forma clara, com parágrafos bem definidos.
+          * **Seções Vazias:** Se uma seção não tiver informações, escreva "Nenhuma informação fornecida na consulta.".
+          
+          ${anamnesisFormat}
+          ${sourceInstruction}
+          `;
+        
+        const body = {"contents": [{"parts": [ { "text": prompt }, { "inline_data": { "mime_type": mimeType, "data": audioBase64 } }]}], "generationConfig": { "temperature": 0.4, "maxOutputTokens": 8192 }};
+        
+        try {
+            const resp = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${await resp.text()}`);
+            
+            const data = await resp.json();
+            const fullResponse = extractText(data);
+            
+            const transcriptionParts = fullResponse.split('--- ANAMNESE ESTRUTURADA ---');
+            const transcriptionText = (transcriptionParts[0] || '').replace('--- TRANSCRIÇÃO ---', '').trim();
+            const anamnesisAndImprovementText = transcriptionParts[1] || '';
+
+            const anamnesisParts = anamnesisAndImprovementText.split('--- PONTOS DE MELHORIA ---');
+            const anamnesisText = (anamnesisParts[0] || 'O modelo não retornou uma anamnese estruturada.').trim();
+            const improvementsText = (anamnesisParts[1] || 'Nenhum ponto de melhoria identificado.').trim();
+            
+            originalTranscriptionText = transcriptionText;
+            transcriptionEl.innerHTML = transcriptionText || 'Não foi possível extrair a transcrição.';
+            anamnesisEl.innerHTML = anamnesisText; 
+            improvementsEl.innerHTML = improvementsText;
+            
+            refineSection.classList.remove('hidden');
+            improvementSection.classList.remove('hidden');
+
+            const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
+            statusEl.textContent = `Processo concluído em ${processingTime} segundos! Pronto para revisão.`;
+
+        } catch (err) {
+            console.error("Erro na chamada da API:", err);
+            statusEl.textContent = `Erro ao comunicar com a API do Gemini.`;
+            anamnesisEl.innerHTML = '<span class="placeholder">Falha ao gerar a anamnese.</span>';
+        }
+    }
+
+    async function handleRefinement() {
+        const corrections = correctionsTextarea.value.trim();
+        if (!corrections) {
+            alert("Por favor, insira as correções ou adições na caixa de texto antes de refazer o prontuário.");
+            return;
+        }
+
+        refineButton.disabled = true;
+        refineButton.textContent = "Refazendo...";
+        statusEl.textContent = "Reanalisando com as correções...";
+        refineStatusEl.textContent = '';
+
+        let countdown = 10;
+        refineStatusEl.textContent = `Estimativa: ${countdown}s`;
+        const refineInterval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                refineStatusEl.textContent = `Estimativa: ${countdown}s`;
+            } else {
+                clearInterval(refineInterval);
+                refineStatusEl.textContent = "Finalizando a reanálise...";
+            }
+        }, 1000);
+
+        const selectedPreset = specialtyPresets[selectedSpecialty];
+        let sourceInstruction = '';
+
+        if (selectedPreset && selectedPreset.sources.length > 0) {
+            const sourceList = selectedPreset.sources.map(s => `- ${s}`).join('\n');
+            sourceInstruction = `
+            \n\n**DIRETRIZ DE REFINAMENTO PARA PLANO TERAPÊUTICO E MELHORIAS:**
+            Ao refazer o plano terapêutico e os pontos de melhoria, analise e utilize prioritariamente a(s) fonte(s) mais relevante(s) da lista abaixo, que pertence ao contexto de "${selectedPreset.displayName}".
+            
+            **Fontes Confiáveis Pré-selecionadas:**
+            ${sourceList}
+            `;
+        } else {
+            sourceInstruction = `
+            \n\n**DIRETRIZ DE REFINAMENTO PARA PLANO TERAPÊUTICO E MELHORIAS:**
+            Ao refazer o plano terapêutico e os pontos de melhoria, adicione sugestões de conduta baseadas no maior grau de evidência científica atual sobre o assunto da consulta.
+            `;
+        }
+
+        let anamnesisFormat;
+        if (anamnesisMethod === 'soap') {
+             anamnesisFormat = `
+            **Refaça o prontuário usando estritamente o formato S.O.A.P.:**
+            <strong>S (Subjetivo):</strong> Compile aqui tudo o que o paciente relata.
+            <strong>O (Objetivo):</strong> Liste aqui apenas informações objetivas. Se não houver, indique "Nenhuma informação objetiva fornecida.".
+            <strong>A (Avaliação):</strong> Apresente a(s) hipótese(s) diagnóstica(s) (HD).
+            <strong>P (Plano):</strong> Descreva o plano de ação. Para cada item, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
+            <strong>Fonte do Plano:</strong> [OBRIGATÓRIO: Cite aqui a(s) fonte(s) COMPLETA(S) usada(s) para basear o plano terapêutico]
+            `;
+        } else { // Método Tradicional
+             anamnesisFormat = `
+            **Gere a anamnese usando o seguinte formato:**
+            <strong>Identificação do Paciente:</strong>
+            <strong>Queixa Principal (QP):</strong>
+            <strong>História da Doença Atual (HDA):</strong>
+            <strong>Revisão de Sistemas:</strong>
+            <strong>História Médica Pregressa (HMP):</strong>
+            <strong>História Familiar (HF):</strong>
+            <strong>História Social e Hábitos de Vida (HSHV):</strong>
+            <strong>Hipóteses Diagnósticas (HD):</strong>
+            <strong>Plano Terapêutico Sugerido:</strong> Para cada item do plano, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
+            <strong>Fonte da Sugestão Terapêutica:</strong> [OBRIGATÓRIO: Cite aqui a(s) fonte(s) COMPLETA(S) usada(s) para basear o plano terapêutico]
+            `;
+        }
+
+        const prompt = `
+        Você é um assistente médico especialista. Sua tarefa é refazer um prontuário médico e sugerir melhorias.
+        Abaixo estão a transcrição ORIGINAL de uma consulta e as CORREÇÕES manuais feitas por um profissional de saúde.
+        Sua missão é gerar um NOVO prontuário estruturado, combinando as informações da transcrição original com as correções para garantir máxima precisão.
+
+        --- TRANSCRIÇÃO ORIGINAL ---
+        ${originalTranscriptionText}
+
+        --- CORREÇÕES E ADIÇÕES DO PROFISSIONAL ---
+        ${corrections}
+
+        --- FIM DAS INFORMAÇÕES ---
+
+        **SUA TAREFA FINAL (em duas partes):**
+
+        **PARTE 1: Gerar o Prontuário Corrigido**
+        * Crie o prontuário final no formato solicitado abaixo, incorporando as correções.
+        
+        **PARTE 2: Analisar Pontos de Melhoria**
+        * Com base na transcrição, correções e fontes de referência, gere a seção "Pontos a Melhorar/Acrescentar".
+        * Identifique perguntas ou investigações que o médico poderia ter feito para aprofundar o caso.
+        * **Para cada ponto**, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
+        * Ao final de todos os pontos, adicione um item <strong>Fontes das Sugestões de Melhoria:</strong> e liste a(s) referência(s) completa(s) utilizada(s).
+
+        **FORMATO DA RESPOSTA (OBRIGATÓRIO):**
+        Entregue o prontuário corrigido primeiro, seguido pelo separador "--- PONTOS DE MELHORIA ---", e então a seção de pontos a melhorar.
+
+        **REGRAS DE FORMATAÇÃO (MUITO IMPORTANTE):**
+        * **Negrito:** Use exclusivamente a tag HTML <strong>Negrito</strong>. **NUNCA** use asteriscos (**).
+        * **Estrutura:** Organize o texto de forma clara e com parágrafos bem definidos.
+        * **Seções Vazias:** Se uma seção não tiver informações, escreva "Nenhuma informação fornecida na consulta.".
+
+        ${anamnesisFormat}
+        ${sourceInstruction}
+        `;
+
+
+        const body = {"contents": [{"parts": [{ "text": prompt }]}], "generationConfig": { "temperature": 0.3, "maxOutputTokens": 8192 }};
+
+        try {
+            const resp = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${await resp.text()}`);
+            
+            const data = await resp.json();
+            const fullResponse = extractText(data);
+            
+            const parts = fullResponse.split('--- PONTOS DE MELHORIA ---');
+            const newAnamnesis = (parts[0] || 'O modelo não retornou um prontuário refeito.').trim();
+            const newImprovements = (parts[1] || 'Nenhum ponto de melhoria identificado.').trim();
+
+            anamnesisEl.innerHTML = newAnamnesis;
+            improvementsEl.innerHTML = newImprovements;
+            statusEl.textContent = "Prontuário refeito com sucesso a partir das suas correções!";
+
+        } catch (err) {
+            console.error("Erro ao refazer anamnese:", err);
+            statusEl.textContent = `Erro ao refazer o prontuário.`;
+        } finally {
+            clearInterval(refineInterval);
+            refineStatusEl.textContent = '';
+            refineButton.disabled = false;
+            refineButton.textContent = "Refazer Prontuário com Correções";
+        }
+    }
+
+
+    // === FUNÇÕES AUXILIARES ===
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+    function extractText(json) {
+        try { return json.candidates[0].content.parts[0].text; } 
+        catch (e) { console.error('Erro no parse da resposta da API', e, json); return 'Erro ao extrair texto da resposta.'; }
+    }
+    function updateButtonsUI() {
+        if (!isRecording) {
+            recordButton.classList.remove('hidden');
+            pauseButton.classList.add('hidden');
+            resumeButton.classList.add('hidden');
+            sendButton.classList.add('hidden');
+        } else {
+            recordButton.classList.add('hidden');
+            sendButton.classList.remove('hidden');
+            if (isPaused) {
+                pauseButton.classList.add('hidden');
+                resumeButton.classList.remove('hidden');
+            } else {
+                pauseButton.classList.remove('hidden');
+                resumeButton.classList.add('hidden');
+            }
+        }
+    }
+  })();
+  </script>
+</body>
+</html>
