@@ -92,7 +92,7 @@
     }
 
     .container {
-      position: relative; /* Essencial para posicionar elementos filhos */
+      position: relative;
       width: 100%;
       max-width: 800px;
       background: var(--background-color-card);
@@ -117,58 +117,91 @@
         z-index: 5;
     }
     
-    /* === [AJUSTE] CONTÊINER DO TOPO COM GRID PARA LARGURA IGUAL === */
+    /* === [AJUSTE] ESTRUTURA DO TOPO COM MENU DE AÇÕES === */
     .top-controls {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr); /* Cria 3 colunas de largura igual */
-      gap: 12px;
-      align-items: start;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 24px;
     }
     
-    /* === [AJUSTE] ESTILO UNIFICADO PARA OS 3 BOTÕES DO TOPO === */
-    .method-toggle-btn, .history-btn, .theme-toggle-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid var(--border-color);
-        color: var(--text-color);
-        padding: 8px 12px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-family: var(--font-family);
-        font-weight: 600;
-        transition: all 0.3s ease;
-        width: 100%; /* Ocupa 100% da célula do grid */
-        box-sizing: border-box; /* Garante que o padding não quebre o layout */
-        white-space: nowrap; /* Impede a quebra de texto */
-        text-align: center;
-        font-size: 0.85rem; /* Fonte ligeiramente menor para caber melhor */
-        overflow: hidden; /* Esconde texto que possa transbordar */
-        text-overflow: ellipsis; /* Adiciona '...' se o texto for muito grande */
-    }
-
-    .method-toggle-btn:hover, .history-btn:hover, .theme-toggle-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    .method-drawer, .theme-drawer {
+    /* Novo Menu de Ações (Direita) */
+    .actions-drawer {
       position: relative;
     }
-    
-    .theme-options {
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        background: var(--background-color-card);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        z-index: 10;
+
+    .actions-toggle-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .actions-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .actions-toggle-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .actions-options {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 200px;
+      background: var(--background-color-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Estilo para botões dentro do novo menu */
+    .actions-options .history-btn {
+      background: transparent;
+      border: none;
+      width: 100%;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 500;
+      border-radius: 8px;
+    }
+
+    .actions-options .history-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
     }
     
+    /* Estilo para a seção de temas dentro do novo menu */
+    .theme-selector-container {
+      padding: 10px 12px;
+    }
+
+    .theme-selector-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-color);
+      opacity: 0.9;
+      margin-bottom: 12px;
+    }
+
+    .theme-dots-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+
     .theme-dot {
         width: 24px;
         height: 24px;
@@ -178,22 +211,33 @@
         transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    .theme-dot:hover {
-        transform: scale(1.2);
-    }
-
-    .theme-dot.active {
-        border-color: #ffffff;
-        transform: scale(1.25);
-    }
-
+    .theme-dot:hover { transform: scale(1.2); }
+    .theme-dot.active { border-color: #ffffff; transform: scale(1.25); }
     .theme-dot[data-theme="minty-pink"] { background: linear-gradient(135deg, #009195 0%, #5ff4ab 100%); }
     .theme-dot[data-theme="default"] { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
     .theme-dot[data-theme="sunset"] { background: linear-gradient(135deg, #d35400 0%, #e67e22 100%); }
     .theme-dot[data-theme="ocean"] { background: linear-gradient(135deg, #005aa7 0%, #00c6ff 100%); }
     .theme-dot[data-theme="forest"] { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
     .theme-dot[data-theme="dark-rose"] { background: linear-gradient(135deg, #e83e8c 0%, #6f42c1 100%); }
+
+    /* Seletor de Método (Esquerda) */
+    .method-drawer { position: relative; }
     
+    .method-toggle-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: var(--font-family);
+        font-weight: 600;
+        transition: background 0.3s ease;
+        min-width: 180px;
+        text-align: center;
+    }
+    .method-toggle-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
     .method-options {
         position: absolute;
         top: calc(100% + 8px);
@@ -217,9 +261,7 @@
         font-weight: 500;
         color: var(--text-color);
     }
-    .method-option:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+    .method-option:hover { background-color: rgba(255, 255, 255, 0.1); }
     .method-option.active {
         background-color: var(--secondary-color);
         color: #111;
@@ -311,9 +353,7 @@
         font-weight: 500;
         color: var(--text-color);
     }
-    .specialty-option:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+    .specialty-option:hover { background-color: rgba(255, 255, 255, 0.1); }
     .specialty-option.active {
         background-color: var(--secondary-color);
         color: #111;
@@ -350,19 +390,16 @@
       transform: translateY(-3px);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
-
     .recorder-controls button:active {
       transform: translateY(-1px) scale(0.98);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
-
     .recorder-controls button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
-
     .recorder-controls button svg {
       width: 22px;
       height: 22px;
@@ -378,26 +415,11 @@
       border: 1px solid var(--border-color);
     }
 
-    #recordButton {
-      background: linear-gradient(45deg, var(--accent-color-start), var(--accent-color-stop));
-    }
-
-    #resetButton {
-      background-color: var(--info-color);
-    }
-
-    #pauseButton, #resumeButton {
-      background-color: var(--warning-color);
-      color: #111;
-    }
-
-    #sendButton {
-      background-color: var(--success-color);
-    }
-
-    .hidden {
-      display: none !important;
-    }
+    #recordButton { background: linear-gradient(45deg, var(--accent-color-start), var(--accent-color-stop)); }
+    #resetButton { background-color: var(--info-color); }
+    #pauseButton, #resumeButton { background-color: var(--warning-color); color: #111; }
+    #sendButton { background-color: var(--success-color); }
+    .hidden { display: none !important; }
 
     #status {
       text-align: center;
@@ -446,10 +468,7 @@
       100% { transform: rotate(360deg); }
     }
 
-    .output-section {
-      margin-top: 24px;
-    }
-
+    .output-section { margin-top: 24px; }
     .output-section h2 {
       font-size: 1.25rem;
       font-weight: 600;
@@ -458,7 +477,6 @@
       padding-bottom: 8px;
       margin-bottom: 16px;
     }
-
     .output-content {
       background-color: rgba(0, 0, 0, 0.2);
       border: 1px solid var(--border-color);
@@ -486,7 +504,6 @@
         font-size: 0.95rem;
         line-height: 1.7;
     }
-
     #correctionsTextarea:focus {
         outline: none;
         border-color: var(--secondary-color);
@@ -527,10 +544,7 @@
         min-height: 22px;
     }
 
-    .output-content .placeholder {
-      color: #777;
-      font-style: italic;
-    }
+    .output-content .placeholder { color: #777; font-style: italic; }
 
     #historyModal {
         max-width: 600px;
@@ -543,9 +557,7 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(10px);
     }
-    #historyModal::backdrop {
-        background: rgba(0, 0, 0, 0.6);
-    }
+    #historyModal::backdrop { background: rgba(0, 0, 0, 0.6); }
     #historyModal h2 {
         text-align: center;
         margin-top: 0;
@@ -595,14 +607,8 @@
         transition: all 0.3s ease;
         font-family: var(--font-family);
     }
-    #clearHistoryButton {
-        background-color: var(--danger-color);
-        color: white;
-    }
-    #closeHistoryButton {
-        background-color: var(--info-color);
-        color: white;
-    }
+    #clearHistoryButton { background-color: var(--danger-color); color: white; }
+    #closeHistoryButton { background-color: var(--info-color); color: white; }
 
   </style>
 </head>
@@ -619,17 +625,25 @@
         </div>
       </div>
       
-      <button class="history-btn" id="historyButton">Histórico</button>
-
-      <div class="theme-drawer">
-        <button class="theme-toggle-btn">Trocar tema</button>
-        <div class="theme-options hidden">
-          <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
-          <span class="theme-dot" data-theme="default" title="Padrão"></span>
-          <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
-          <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
-          <span class="theme-dot" data-theme="forest" title="Floresta"></span>
-          <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+      <div class="actions-drawer">
+        <button class="actions-toggle-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+          </svg>
+        </button>
+        <div class="actions-options hidden">
+          <button class="history-btn" id="historyButton">Histórico</button>
+          <div class="theme-selector-container">
+            <div class="theme-selector-title">Trocar Tema</div>
+            <div class="theme-dots-wrapper">
+              <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
+              <span class="theme-dot" data-theme="default" title="Padrão"></span>
+              <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
+              <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
+              <span class="theme-dot" data-theme="forest" title="Floresta"></span>
+              <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -753,7 +767,7 @@
     const MODEL = 'gemini-2.5-flash';
     const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
     const VELOCIDADE_ROLAGEM = 4;
-    const CONSULTATION_HISTORY_KEY = 'anamnesis_history'; // [NOVO] Chave para o localStorage
+    const CONSULTATION_HISTORY_KEY = 'anamnesis_history';
 
     // === ELEMENTOS DA PÁGINA ===
     const recordButton = document.getElementById('recordButton');
@@ -780,7 +794,6 @@
     const examsSuggestionsEl = document.getElementById('examsSuggestions');
     const prescriptionSection = document.getElementById('prescriptionSection');
     const prescriptionSuggestionsEl = document.getElementById('prescriptionSuggestions');
-    // [NOVO] Elementos do Histórico
     const historyButton = document.getElementById('historyButton');
     const historyModal = document.getElementById('historyModal');
     const historyListEl = document.getElementById('historyList');
@@ -809,10 +822,10 @@
     let anamnesisMethod = 'tradicional';
 
 
-    // === LÓGICA DE TEMAS ===
-    const themeDrawer = document.querySelector('.theme-drawer');
-    const themeToggleButton = document.querySelector('.theme-toggle-btn');
-    const themeOptions = document.querySelector('.theme-options');
+    // === LÓGICA DE TEMAS E MENU DE AÇÕES ===
+    const actionsDrawer = document.querySelector('.actions-drawer');
+    const actionsToggleButton = document.querySelector('.actions-toggle-btn');
+    const actionsOptions = document.querySelector('.actions-options');
     const themeDots = document.querySelectorAll('.theme-dot');
     const bodyEl = document.body;
 
@@ -833,14 +846,19 @@
         });
         localStorage.setItem('anamnesis_theme', themeName);
     }
-    themeToggleButton.addEventListener('click', () => themeOptions.classList.toggle('hidden'));
-    themeOptions.addEventListener('click', (e) => {
+    
+    // Listener para o botão do menu de ações
+    actionsToggleButton.addEventListener('click', () => actionsOptions.classList.toggle('hidden'));
+
+    // Listener dentro do menu de ações (para os temas)
+    actionsOptions.addEventListener('click', (e) => {
         if (e.target.classList.contains('theme-dot')) {
             applyTheme(e.target.dataset.theme);
-            themeOptions.classList.add('hidden');
+            // Opcional: fechar o menu ao selecionar um tema
+            // actionsOptions.classList.add('hidden');
         }
     });
-    
+
     // === LÓGICA DE MÉTODO DE ANAMNESE ===
     const methodDrawer = document.querySelector('.method-drawer');
     const methodToggleButton = document.querySelector('.method-toggle-btn');
@@ -877,62 +895,15 @@
     const specialtyOptionsContainer = document.querySelector('.specialty-options');
 
     const specialtyPresets = {
-        'none': {
-            displayName: 'Nenhuma (Padrão)',
-            sources: []
-        },
+        'none': { displayName: 'Nenhuma (Padrão)', sources: [] },
         'mfc': {
             displayName: 'Medicina de Família e Comunidade',
-            sources: [
-                'https://bvsms.saude.gov.br/bvs/publicacoes/manual_tecnico_controle_tuberculose_cab6.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/violencia_intrafamiliar_cab8.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/dermatologia_atencao_basica_saude_cab9.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/guia_controle_hanseniase_cab10.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/controle_canceres_colo_utero_2013.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/abcad14.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_bucal.pdf',
-                'https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/svsa/atencao-basica/cadernos-de-atencao-basica-18.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/abcad19.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_carencias_micronutrientes.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/cab_n21_vigilancia_saude_2ed_p1.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/vigilancia_saude_zoonoses_p1.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_crianca_aleitamento_materno_cab23.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_24.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/doencas_respiratorias_cronicas.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_sexual_saude_reprodutiva.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/caderno_atencao_basica_diretrizes_nasf.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/acolhimento_demanda_espontanea_cab28v1.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/caderno_atencao_primaria_29_rastreamento.pdf',
-                'https://biblioteca.cofen.gov.br/wp-content/uploads/2016/07/Caderno-de-aten%C3%A7%C3%A3o-prim%C3%A1ria-n30-procedimentos.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/praticas_integrativas_complementares_plantas_medicinais_cab31.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_32_prenatal.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_crianca_crescimento_desenvolvimento.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_34_saude_mental.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_pessoa_doenca_cronica_cab35.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_pessoa_diabetes_mellitus_cab36.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/hipertensao_arterial_sistemica_cab37.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_doenca_cronica_obesidade_cab38.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/nucleo_apoio_saude_familia_cab39.pdf',
-                'https://biblioteca.cofen.gov.br/wp-content/uploads/2017/01/Estrat%C3%A9gias-para-o-cuidado-da-pessoa-com-doen%C3%A7a-cr%C3%B4nica-o-cuidado-da-pessoa-tabagista.pdf',
-                'https://bvsms.saude.gov.br/bvs/publicacoes/saude_trabalhador_trabalhadora.pdf'
-            ]
+            sources: [ 'https://bvsms.saude.gov.br/bvs/publicacoes/manual_tecnico_controle_tuberculose_cab6.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/violencia_intrafamiliar_cab8.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/dermatologia_atencao_basica_saude_cab9.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/guia_controle_hanseniase_cab10.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/controle_canceres_colo_utero_2013.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/abcad14.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/saude_bucal.pdf', 'https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/svsa/atencao-basica/cadernos-de-atencao-basica-18.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/abcad19.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_carencias_micronutrientes.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/cab_n21_vigilancia_saude_2ed_p1.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/vigilancia_saude_zoonoses_p1.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/saude_crianca_aleitamento_materno_cab23.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_24.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/doencas_respiratorias_cronicas.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/saude_sexual_saude_reprodutiva.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/caderno_atencao_basica_diretrizes_nasf.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/acolhimento_demanda_espontanea_cab28v1.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/caderno_atencao_primaria_29_rastreamento.pdf', 'https://biblioteca.cofen.gov.br/wp-content/uploads/2016/07/Caderno-de-aten%C3%A7%C3%A3o-prim%C3%A1ria-n30-procedimentos.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/praticas_integrativas_complementares_plantas_medicinais_cab31.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_32_prenatal.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/saude_crianca_crescimento_desenvolvimento.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/cadernos_atencao_basica_34_saude_mental.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_pessoa_doenca_cronica_cab35.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_pessoa_diabetes_mellitus_cab36.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/hipertensao_arterial_sistemica_cab37.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/estrategias_cuidado_doenca_cronica_obesidade_cab38.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/nucleo_apoio_saude_familia_cab39.pdf', 'https://biblioteca.cofen.gov.br/wp-content/uploads/2017/01/Estrat%C3%A9gias-para-o-cuidado-da-pessoa-com-doen%C3%A7a-cr%C3%B4nica-o-cuidado-da-pessoa-tabagista.pdf', 'https://bvsms.saude.gov.br/bvs/publicacoes/saude_trabalhador_trabalhadora.pdf' ]
         },
-        'clinica_medica': {
-            displayName: 'Clínica Médica (Hospitalar)',
-            sources: []
-        },
-        'cardiologia': {
-            displayName: 'Cardiologia',
-            sources: []
-        },
-        'endocrinologia': {
-            displayName: 'Endocrinologia',
-            sources: []
-        },
-        'pediatria': {
-            displayName: 'Pediatria',
-            sources: []
-        }
+        'clinica_medica': { displayName: 'Clínica Médica (Hospitalar)', sources: [] },
+        'cardiologia': { displayName: 'Cardiologia', sources: [] },
+        'endocrinologia': { displayName: 'Endocrinologia', sources: [] },
+        'pediatria': { displayName: 'Pediatria', sources: [] }
     };
     let selectedSpecialty = 'none';
 
@@ -968,10 +939,10 @@
         }
     });
 
-    // Evento unificado para fechar gavetas ao clicar fora
+    // Evento unificado para fechar todos os menus/gavetas ao clicar fora
     document.addEventListener('click', (e) => {
-        if (!themeDrawer.contains(e.target) && !themeOptions.classList.contains('hidden')) {
-            themeOptions.classList.add('hidden');
+        if (!actionsDrawer.contains(e.target) && !actionsOptions.classList.contains('hidden')) {
+            actionsOptions.classList.add('hidden');
         }
         if (!methodDrawer.contains(e.target) && !methodOptionsContainer.classList.contains('hidden')) {
             methodOptionsContainer.classList.add('hidden');
@@ -997,6 +968,7 @@
         historyListEl.addEventListener('click', loadConsultationFromHistory);
     });
     
+    // === FUNÇÕES DE HISTÓRICO ===
     function getHistory() {
         const historyJson = localStorage.getItem(CONSULTATION_HISTORY_KEY);
         return historyJson ? JSON.parse(historyJson) : [];
@@ -1094,6 +1066,8 @@
         }
     }
 
+
+    // === FUNÇÕES DO CONTADOR DE GRAVAÇÃO ===
     function formatTime(totalSeconds) {
         const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
         const seconds = (totalSeconds % 60).toString().padStart(2, '0');
@@ -1116,6 +1090,7 @@
         timerInterval = null;
     }
 
+    // === FUNÇÕES DE VISUALIZAÇÃO DE ÁUDIO ===
     function visualize(stream) {
         if (!audioContext || audioContext.state === 'closed') audioContext = new AudioContext();
         const source = audioContext.createMediaStreamSource(stream);
@@ -1152,6 +1127,7 @@
         canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, minVal, VELOCIDADE_ROLAGEM, amplitude);
     }
     
+    // === FUNÇÕES DO CONTADOR DE ESTIMATIVA ===
     function startEstimationCountdown(duration) {
       if (estimationInterval) clearInterval(estimationInterval);
       let timeLeft = duration;
@@ -1173,6 +1149,7 @@
       estimationTimerEl.textContent = '';
     }
 
+    // === LÓGICA PRINCIPAL DE GRAVAÇÃO E CONTROLES ===
     recordButton.addEventListener('click', startRecording);
     pauseButton.addEventListener('click', pauseRecording);
     resumeButton.addEventListener('click', resumeRecording);
@@ -1315,6 +1292,8 @@
         sendButton.disabled = false;
       }
     }
+
+    // === LÓGICA DE CHAMADA À API E REFINAMENTO ===
 
     async function callGeminiAPI(audioBase64, mimeType) {
         const selectedPreset = specialtyPresets[selectedSpecialty];
@@ -1620,6 +1599,8 @@
         }
     }
 
+
+    // === FUNÇÕES AUXILIARES ===
     function blobToBase64(blob) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
