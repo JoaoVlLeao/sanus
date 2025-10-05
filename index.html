@@ -118,24 +118,26 @@
         z-index: 5;
     }
     
-    /* === [NOVO/AJUSTADO] CONTAINER PARA CONTROLES SUPERIORES === */
-    .top-controls-wrapper {
-        display: flex;
-        flex-wrap: wrap; /* Permite que os botões quebrem para a linha de baixo em telas muito pequenas */
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 16px; /* Adiciona espaço antes do logo */
-        position: relative;
-        z-index: 10;
+    /* === [AJUSTE] NOVO CONTÊINER PARA OS CONTROLES DO TOPO === */
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
     }
 
-    /* === [NOVO] Botão de Engrenagem (Settings) === */
-    .settings-drawer {
+    .right-header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* SELETOR DE TEMAS ESTILO GAVETA (MODIFICADO) */
+    .theme-drawer {
         position: relative;
     }
 
-    .settings-toggle-btn, .history-btn { /* Estilo unificado */
+    .theme-toggle-btn, .history-btn { /* Estilo unificado */
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid var(--border-color);
         color: var(--text-color);
@@ -144,36 +146,17 @@
         cursor: pointer;
         font-family: var(--font-family);
         font-weight: 600;
-        transition: background 0.3s ease;
-        display: flex; /* Para alinhar o SVG com o texto, se houver */
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-    
-    /* Apenas para o botão de engrenagem, torná-lo circular */
-    .settings-toggle-btn {
-        width: 40px; /* Largura e altura iguais para ser circular */
-        height: 40px;
-        padding: 0; /* Remover padding para que o ícone se ajuste */
-        border-radius: 50%; /* Torna-o circular */
-        font-size: 1.2rem; /* Tamanho do ícone */
-    }
-    .settings-toggle-btn svg {
-        width: 20px; /* Ajusta o tamanho do SVG dentro do botão */
-        height: 20px;
+        transition: all 0.3s ease;
     }
 
-
-    .settings-toggle-btn:hover, .history-btn:hover { /* Estilo unificado */
+    .theme-toggle-btn:hover, .history-btn:hover { /* Estilo unificado */
         background: rgba(255, 255, 255, 0.2);
     }
 
-    /* === [NOVO] Gaveta de Configurações === */
-    .settings-options {
+    .theme-options {
         position: absolute;
         top: calc(100% + 8px);
-        left: 0; /* Abre para a esquerda */
+        right: 0;
         background: var(--background-color-card);
         border: 1px solid var(--border-color);
         border-radius: 12px;
@@ -182,91 +165,12 @@
         flex-direction: column;
         gap: 10px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        min-width: 220px; /* Largura mínima para as opções */
+        z-index: 10;
     }
-
-    /* === Controles dentro da Gaveta de Configurações === */
-    .settings-item-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 10px; /* Espaço entre grupos */
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--border-color); /* Separador */
-    }
-
-    .settings-item-group:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-    }
-
-    .settings-item-group label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--text-color);
-        opacity: 0.9;
-        margin-bottom: 4px;
-        display: block;
-    }
-
-    /* Estilos para o Seletor de Método dentro da gaveta */
-    .method-select-btn {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--border-color);
-        color: var(--text-color);
-        padding: 8px 12px;
-        border-radius: 12px;
-        cursor: pointer;
-        font-family: var(--font-family);
-        font-weight: 500;
-        font-size: 0.9rem;
-        transition: background 0.3s ease;
-        text-align: left;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    .method-select-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-    }
-    .method-options-nested {
-        background: rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        padding: 4px;
-        margin-top: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-    .method-option {
-        padding: 8px 12px;
-        cursor: pointer;
-        border-radius: 6px;
-        transition: background-color 0.2s ease;
-        font-weight: 400;
-        font-size: 0.85rem;
-        color: var(--text-color);
-    }
-    .method-option:hover {
-        background-color: rgba(255, 255, 255, 0.08);
-    }
-    .method-option.active {
-        background-color: var(--secondary-color);
-        color: #111;
-        font-weight: 600;
-    }
-
-    /* Estilos para os temas dentro da gaveta */
-    .theme-dots-container {
-        display: flex;
-        flex-wrap: wrap; /* Permite que os dots quebrem a linha */
-        gap: 8px;
-        margin-top: 8px;
-        justify-content: center; /* Centraliza os dots */
-    }
+    
     .theme-dot {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         cursor: pointer;
         border: 2px solid rgba(255, 255, 255, 0.5);
@@ -274,12 +178,12 @@
     }
 
     .theme-dot:hover {
-        transform: scale(1.1);
+        transform: scale(1.2);
     }
 
     .theme-dot.active {
         border-color: #ffffff;
-        transform: scale(1.15);
+        transform: scale(1.25);
     }
 
     .theme-dot[data-theme="minty-pink"] { background: linear-gradient(135deg, #009195 0%, #5ff4ab 100%); }
@@ -289,10 +193,63 @@
     .theme-dot[data-theme="forest"] { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
     .theme-dot[data-theme="dark-rose"] { background: linear-gradient(135deg, #e83e8c 0%, #6f42c1 100%); }
 
+    /* === [AJUSTE] SELETOR DE MÉTODO DE ANAMNESE === */
+    .method-drawer {
+        position: relative; /* Removido posicionamento absoluto */
+    }
+    .method-toggle-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: var(--font-family);
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 180px; /* Garante que não pule de tamanho */
+        text-align: center;
+    }
+    .method-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    .method-options {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background: var(--background-color-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        width: 100%;
+        z-index: 10;
+    }
+    .method-option {
+        padding: 10px 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    .method-option:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .method-option.active {
+        background-color: var(--secondary-color);
+        color: #111;
+        font-weight: 700;
+    }
+
 
     .header {
-        text-align: center;
-        margin-bottom: 24px; /* Ajustado */
+      text-align: center;
+      margin-bottom: 24px; /* Ajustado */
+      /* Removido margin-top, pois o novo layout controla o espaçamento */
     }
 
     .header h1 {
@@ -682,43 +639,49 @@
         color: white;
     }
 
+    /* === [AJUSTE] MEDIA QUERY PARA TELAS MENORES === */
+    @media (max-width: 550px) {
+      .method-toggle-btn, .history-btn, .theme-toggle-btn {
+        padding: 6px 10px;
+        font-size: 0.75rem; /* 12px */
+      }
+      .method-toggle-btn {
+        min-width: 0; /* Remove a largura mínima para se ajustar */
+      }
+      .right-header-controls {
+        gap: 8px; /* Reduz o espaço entre os botões da direita */
+      }
+    }
+
   </style>
 </head>
 <body class="theme-minty-pink">
 
   <div class="container">
     
-    <div class="top-controls-wrapper">
-        <div class="settings-drawer">
-            <button class="settings-toggle-btn" title="Configurações">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
-                    <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.4 1.4 0 0 1-1.265.95c-1.073.18-1.528 1.24-.942 2.15l.1.159a1.4 1.4 0 0 1-.31 1.275l-.3.458c-1.207 1.465-.338 3.42.942 3.756l.17.042a1.4 1.4 0 0 1 1.056.661l.105.192c.32.749 1.246 1.092 1.96.727l.107-.055a1.4 1.4 0 0 1 1.265 1.01l.099.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.4 1.4 0 0 1 1.265-.95c1.073-.18 1.528-1.24.942-2.15l-.1-.159a1.4 1.4 0 0 1 .31-1.275l.3-.458c1.207-1.465.338-3.42-.942-3.756l-.17-.042a1.4 1.4 0 0 1-1.056-.661l-.105-.192c-.32-.749-1.246-1.092-1.96-.727l-.107.055a1.4 1.4 0 0 1-1.265-1.01l-.099-.34zM8 10.93a2.929 2.929 0 1 0 0-5.86 2.929 2.929 0 0 0 0 5.858z"/>
-                </svg>
-            </button>
-            <div class="settings-options hidden">
-                <div class="settings-item-group">
-                    <label>Método de Anamnese</label>
-                    <button class="method-select-btn">Tradicional</button>
-                    <div class="method-options-nested hidden">
-                        <div class="method-option active" data-method="tradicional">Anamnese Tradicional</div>
-                        <div class="method-option" data-method="soap">Prontuário S.O.A.P.</div>
-                    </div>
-                </div>
-                <div class="settings-item-group">
-                    <label>Trocar Tema</label>
-                    <div class="theme-dots-container">
-                        <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
-                        <span class="theme-dot" data-theme="default" title="Padrão"></span>
-                        <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
-                        <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
-                        <span class="theme-dot" data-theme="forest" title="Floresta"></span>
-                        <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
-                    </div>
-                </div>
-            </div>
+    <div class="top-controls">
+      <div class="method-drawer">
+        <button class="method-toggle-btn">Método: Tradicional</button>
+        <div class="method-options hidden">
+          <div class="method-option active" data-method="tradicional">Anamnese Tradicional</div>
+          <div class="method-option" data-method="soap">Prontuário S.O.A.P.</div>
         </div>
-        
-        <button class="history-btn" id="historyButton">Histórico</button>
+      </div>
+      
+      <div class="right-header-controls">
+          <button class="history-btn" id="historyButton">Histórico</button>
+          <div class="theme-drawer">
+              <button class="theme-toggle-btn">Trocar tema</button>
+              <div class="theme-options hidden">
+                  <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
+                  <span class="theme-dot" data-theme="default" title="Padrão"></span>
+                  <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
+                  <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
+                  <span class="theme-dot" data-theme="forest" title="Floresta"></span>
+                  <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+              </div>
+          </div>
+      </div>
     </div>
 
 
@@ -897,11 +860,10 @@
 
 
     // === LÓGICA DE TEMAS ===
-    const settingsDrawer = document.querySelector('.settings-drawer');
-    const settingsToggleButton = document.querySelector('.settings-toggle-btn');
-    const settingsOptions = document.querySelector('.settings-options');
-    const themeDotsContainer = settingsOptions.querySelector('.theme-dots-container');
-    const themeDots = themeDotsContainer.querySelectorAll('.theme-dot');
+    const themeDrawer = document.querySelector('.theme-drawer');
+    const themeToggleButton = document.querySelector('.theme-toggle-btn');
+    const themeOptions = document.querySelector('.theme-options');
+    const themeDots = document.querySelectorAll('.theme-dot');
     const bodyEl = document.body;
 
     function applyTheme(themeName) {
@@ -921,24 +883,19 @@
         });
         localStorage.setItem('anamnesis_theme', themeName);
     }
-    
-    // Toggle para abrir/fechar a gaveta de configurações
-    settingsToggleButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede que o clique se propague para o document e feche imediatamente
-        settingsOptions.classList.toggle('hidden');
-    });
-
-    themeDotsContainer.addEventListener('click', (e) => {
+    themeToggleButton.addEventListener('click', () => themeOptions.classList.toggle('hidden'));
+    themeOptions.addEventListener('click', (e) => {
         if (e.target.classList.contains('theme-dot')) {
             applyTheme(e.target.dataset.theme);
-            // Manter a gaveta aberta após trocar o tema para permitir outras configs
+            themeOptions.classList.add('hidden');
         }
     });
     
-    // === LÓGICA DE MÉTODO DE ANAMNESE (MOVIDO PARA DENTRO DA GAVETA) ===
-    const methodSelectBtn = settingsOptions.querySelector('.method-select-btn');
-    const methodOptionsNested = settingsOptions.querySelector('.method-options-nested');
-    const methodOptions = methodOptionsNested.querySelectorAll('.method-option');
+    // === LÓGICA DE MÉTODO DE ANAMNESE ===
+    const methodDrawer = document.querySelector('.method-drawer');
+    const methodToggleButton = document.querySelector('.method-toggle-btn');
+    const methodOptionsContainer = document.querySelector('.method-options');
+    const methodOptions = document.querySelectorAll('.method-option');
 
     function applyMethod(method) {
         anamnesisMethod = method;
@@ -947,26 +904,20 @@
         });
 
         if (method === 'tradicional') {
-            methodSelectBtn.textContent = 'Tradicional';
+            methodToggleButton.textContent = 'Método: Tradicional';
             anamnesisTitleEl.textContent = 'Prontuário / Anamnese Estruturada';
         } else if (method === 'soap') {
-            methodSelectBtn.textContent = 'S.O.A.P.';
+            methodToggleButton.textContent = 'Método: S.O.A.P.';
             anamnesisTitleEl.textContent = 'Prontuário Estruturado (S.O.A.P.)';
         }
         localStorage.setItem('anamnesis_method', method);
     }
-    
-    methodSelectBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Não fecha a gaveta de settings
-        methodOptionsNested.classList.toggle('hidden');
-    });
-
-    methodOptionsNested.addEventListener('click', (e) => {
-        e.stopPropagation(); // Não fecha a gaveta de settings
+    methodToggleButton.addEventListener('click', () => methodOptionsContainer.classList.toggle('hidden'));
+    methodOptionsContainer.addEventListener('click', (e) => {
         const targetOption = e.target.closest('.method-option');
         if (targetOption) {
             applyMethod(targetOption.dataset.method);
-            methodOptionsNested.classList.add('hidden'); // Fecha apenas as opções de método
+            methodOptionsContainer.classList.add('hidden');
         }
     });
 
@@ -1058,10 +1009,7 @@
         }
     }
 
-    specialtyToggleButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede fechamento de outras gavetas
-        specialtyOptionsContainer.classList.toggle('hidden');
-    });
+    specialtyToggleButton.addEventListener('click', () => specialtyOptionsContainer.classList.toggle('hidden'));
     specialtyOptionsContainer.addEventListener('click', (e) => {
         const targetOption = e.target.closest('.specialty-option');
         if (targetOption) {
@@ -1072,15 +1020,12 @@
 
     // Evento unificado para fechar gavetas ao clicar fora
     document.addEventListener('click', (e) => {
-        // Fecha a gaveta de configurações
-        if (!settingsDrawer.contains(e.target) && !settingsOptions.classList.contains('hidden')) {
-            settingsOptions.classList.add('hidden');
+        if (!themeDrawer.contains(e.target) && !themeOptions.classList.contains('hidden')) {
+            themeOptions.classList.add('hidden');
         }
-        // Fecha as opções de método aninhadas, se abertas
-        if (!methodSelectBtn.contains(e.target) && !methodOptionsNested.classList.contains('hidden')) {
-            methodOptionsNested.classList.add('hidden');
+        if (!methodDrawer.contains(e.target) && !methodOptionsContainer.classList.contains('hidden')) {
+            methodOptionsContainer.classList.add('hidden');
         }
-        // Fecha a gaveta de especialidades
         if (!specialtyDrawer.contains(e.target) && !specialtyOptionsContainer.classList.contains('hidden')) {
             specialtyOptionsContainer.classList.add('hidden');
         }
@@ -1356,7 +1301,7 @@
         mediaRecorder.onstop = processAudio;
         
         // Zera o timer para a nova gravação
-        accumulatedTime = 0;  
+        accumulatedTime = 0; 
         startTimer();
         
         mediaRecorder.start();
