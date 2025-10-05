@@ -17,6 +17,7 @@
       --success-color: #28a745;
       --warning-color: #ffc107;
       --info-color: #17a2b8; /* Cor para o botão de reset */
+      --danger-color: #dc3545; /* [NOVO] Cor para o botão de apagar */
       --text-color: #e0e0e0;
       --background-color-main: #121212;
       --background-color-card: rgba(30, 30, 30, 0.7);
@@ -101,7 +102,7 @@
       border: 1px solid var(--border-color);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      box-sizing: border-box; /* <<< CORREÇÃO APLICADA AQUI */
+      box-sizing: border-box;
     }
     
     /* === [NOVO] ESTILO PARA O TEXTO DE CRÉDITO === */
@@ -117,15 +118,22 @@
         z-index: 5;
     }
     
-    /* === SELETOR DE TEMAS ESTILO GAVETA (MODIFICADO) === */
-    .theme-drawer {
+    /* === [NOVO] AGRUPADOR PARA BOTÕES DO CABEÇALHO === */
+    .header-controls {
         position: absolute;
         top: 24px;
         right: 24px;
         z-index: 10;
+        display: flex;
+        gap: 12px;
     }
 
-    .theme-toggle-btn {
+    /* SELETOR DE TEMAS ESTILO GAVETA (MODIFICADO) */
+    .theme-drawer {
+        position: relative; /* Mudou de absolute */
+    }
+
+    .theme-toggle-btn, .history-btn { /* Estilo unificado */
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid var(--border-color);
         color: var(--text-color);
@@ -137,7 +145,7 @@
         transition: background 0.3s ease;
     }
 
-    .theme-toggle-btn:hover {
+    .theme-toggle-btn:hover, .history-btn:hover { /* Estilo unificado */
         background: rgba(255, 255, 255, 0.2);
     }
 
@@ -486,7 +494,7 @@
       border-radius: 12px;
       padding: 20px;
       white-space: pre-wrap;
-      overflow-wrap: break-word; /* <<< CORREÇÃO APLICADA AQUI */
+      overflow-wrap: break-word;
       font-family: 'Poppins', sans-serif;
       min-height: 120px;
       line-height: 1.7;
@@ -555,6 +563,79 @@
       font-style: italic;
     }
 
+    /* === [NOVO] ESTILOS PARA O MODAL DE HISTÓRICO === */
+    #historyModal {
+        max-width: 600px;
+        width: 90%;
+        background: var(--background-color-card);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+    }
+    #historyModal::backdrop {
+        background: rgba(0, 0, 0, 0.6);
+    }
+    #historyModal h2 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: var(--text-color);
+    }
+    #historyList {
+        max-height: 50vh;
+        overflow-y: auto;
+        padding-right: 10px; /* Espaço para a barra de rolagem */
+    }
+    .history-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .history-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateX(4px);
+    }
+    .history-item-date {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+    }
+    .history-item-details {
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+    .modal-actions {
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .modal-actions button {
+        flex-grow: 1;
+        padding: 10px 20px;
+        font-weight: 600;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: var(--font-family);
+    }
+    #clearHistoryButton {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    #closeHistoryButton {
+        background-color: var(--info-color);
+        color: white;
+    }
+
   </style>
 </head>
 <body class="theme-minty-pink">
@@ -569,17 +650,21 @@
       </div>
     </div>
     
-    <div class="theme-drawer">
-      <button class="theme-toggle-btn">Trocar tema</button>
-      <div class="theme-options hidden">
-        <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
-        <span class="theme-dot" data-theme="default" title="Padrão"></span>
-        <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
-        <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
-        <span class="theme-dot" data-theme="forest" title="Floresta"></span>
-        <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
-      </div>
+    <div class="header-controls">
+        <button class="history-btn" id="historyButton">Histórico</button>
+        <div class="theme-drawer">
+            <button class="theme-toggle-btn">Trocar tema</button>
+            <div class="theme-options hidden">
+                <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
+                <span class="theme-dot" data-theme="default" title="Padrão"></span>
+                <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
+                <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
+                <span class="theme-dot" data-theme="forest" title="Floresta"></span>
+                <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+            </div>
+        </div>
     </div>
+
 
     <div class="header">
       <img src="https://cdn.shopify.com/s/files/1/0830/2385/5932/files/Untitled_design_6.png?v=1759647321" alt="Sanus IA Logo" class="main-logo">
@@ -680,6 +765,17 @@
 
     <div class="creator-credit"><strong>Feito por:</strong> João Victor Leão </div>
   </div>
+  
+  <dialog id="historyModal">
+      <h2>Histórico de Consultas</h2>
+      <div id="historyList">
+          </div>
+      <div class="modal-actions">
+          <button id="clearHistoryButton">Apagar Histórico</button>
+          <button id="closeHistoryButton">Fechar</button>
+      </div>
+  </dialog>
+
 
   <script>
   (function(){
@@ -688,13 +784,14 @@
     const MODEL = 'gemini-2.5-flash';
     const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
     const VELOCIDADE_ROLAGEM = 4;
+    const CONSULTATION_HISTORY_KEY = 'anamnesis_history'; // [NOVO] Chave para o localStorage
 
     // === ELEMENTOS DA PÁGINA ===
     const recordButton = document.getElementById('recordButton');
     const pauseButton = document.getElementById('pauseButton');
     const resumeButton = document.getElementById('resumeButton');
     const sendButton = document.getElementById('sendButton');
-    const resetButton = document.getElementById('resetButton'); // NOVO
+    const resetButton = document.getElementById('resetButton');
     const statusEl = document.getElementById('status');
     const transcriptionEl = document.getElementById('transcription');
     const anamnesisEl = document.getElementById('anamnesis');
@@ -710,17 +807,22 @@
     const anamnesisTitleEl = document.getElementById('anamnesisTitle');
     const improvementSection = document.getElementById('improvementSection');
     const improvementsEl = document.getElementById('improvements');
-    // NOVOS ELEMENTOS
     const examsSection = document.getElementById('examsSection');
     const examsSuggestionsEl = document.getElementById('examsSuggestions');
     const prescriptionSection = document.getElementById('prescriptionSection');
     const prescriptionSuggestionsEl = document.getElementById('prescriptionSuggestions');
+    // [NOVO] Elementos do Histórico
+    const historyButton = document.getElementById('historyButton');
+    const historyModal = document.getElementById('historyModal');
+    const historyListEl = document.getElementById('historyList');
+    const closeHistoryButton = document.getElementById('closeHistoryButton');
+    const clearHistoryButton = document.getElementById('clearHistoryButton');
 
 
     // === VARIÁVEIS DE ESTADO ===
     let isRecording = false;
     let isPaused = false;
-    let isConsultationComplete = false; // NOVO: Controla o estado da consulta
+    let isConsultationComplete = false;
     let mediaRecorder;
     let audioChunks = [];
     let audioContext;
@@ -734,7 +836,7 @@
     let estimationInterval = null;
     let estimatedProcessTime = 0;
     let processingStartTime = 0;
-    let originalTranscriptionText = ''; // Armazena a transcrição para refinamento ou adição
+    let originalTranscriptionText = '';
     let anamnesisMethod = 'tradicional';
 
 
@@ -800,7 +902,7 @@
         }
     });
 
-    // === [NOVO] LÓGICA DO CONTEXTO CLÍNICO (ESPECIALIDADES) ===
+    // === LÓGICA DO CONTEXTO CLÍNICO (ESPECIALIDADES) ===
     const specialtyDrawer = document.querySelector('.specialty-drawer');
     const specialtyToggleButton = document.querySelector('.specialty-toggle-btn');
     const specialtyOptionsContainer = document.querySelector('.specialty-options');
@@ -899,7 +1001,9 @@
 
     // Evento unificado para fechar gavetas ao clicar fora
     document.addEventListener('click', (e) => {
-        if (!themeDrawer.contains(e.target) && !themeOptions.classList.contains('hidden')) {
+        // [MODIFICADO] Adicionado o botão de histórico à condição do tema
+        const headerControls = document.querySelector('.header-controls');
+        if (headerControls && !headerControls.contains(e.target) && !themeOptions.classList.contains('hidden')) {
             themeOptions.classList.add('hidden');
         }
         if (!methodDrawer.contains(e.target) && !methodOptionsContainer.classList.contains('hidden')) {
@@ -919,8 +1023,115 @@
         populateSpecialties();
         const savedSpecialty = localStorage.getItem('anamnesis_specialty') || 'none';
         applySpecialty(savedSpecialty);
+        
+        // [NOVO] Adiciona listeners de eventos para o modal de histórico
+        historyButton.addEventListener('click', displayHistory);
+        closeHistoryButton.addEventListener('click', () => historyModal.close());
+        clearHistoryButton.addEventListener('click', clearHistory);
+        historyListEl.addEventListener('click', loadConsultationFromHistory);
     });
     
+    // === [NOVO] FUNÇÕES DE HISTÓRICO ===
+    function getHistory() {
+        const historyJson = localStorage.getItem(CONSULTATION_HISTORY_KEY);
+        return historyJson ? JSON.parse(historyJson) : [];
+    }
+
+    function saveConsultationToHistory() {
+        // Só salva se a consulta tiver sido completada e tiver transcrição
+        const hasPlaceholder = transcriptionEl.querySelector('.placeholder');
+        if (!isConsultationComplete || hasPlaceholder || !transcriptionEl.textContent.trim()) {
+            return;
+        }
+
+        const history = getHistory();
+        const newConsultation = {
+            id: Date.now(),
+            method: anamnesisMethod,
+            specialty: selectedSpecialty,
+            duration: timerDisplayEl.textContent,
+            transcription: transcriptionEl.innerHTML,
+            anamnesis: anamnesisEl.innerHTML,
+            exams: examsSuggestionsEl.innerHTML,
+            prescription: prescriptionSuggestionsEl.innerHTML,
+            improvements: improvementsEl.innerHTML
+        };
+
+        history.unshift(newConsultation); // Adiciona no início (mais recente)
+        localStorage.setItem(CONSULTATION_HISTORY_KEY, JSON.stringify(history));
+    }
+
+    function displayHistory() {
+        const history = getHistory();
+        historyListEl.innerHTML = ''; // Limpa a lista atual
+        if (history.length === 0) {
+            historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta salva ainda.</p>';
+        } else {
+            history.forEach(consultation => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.dataset.id = consultation.id;
+                
+                const date = new Date(consultation.id).toLocaleString('pt-BR');
+                const methodName = consultation.method === 'soap' ? 'S.O.A.P.' : 'Tradicional';
+                const specialtyName = specialtyPresets[consultation.specialty]?.displayName || 'Padrão';
+
+                item.innerHTML = `
+                    <span class="history-item-date">${date}</span>
+                    <span class="history-item-details">
+                        Duração: ${consultation.duration} | Método: ${methodName} | Contexto: ${specialtyName}
+                    </span>
+                `;
+                historyListEl.appendChild(item);
+            });
+        }
+        historyModal.showModal();
+    }
+
+    function loadConsultationFromHistory(e) {
+        const item = e.target.closest('.history-item');
+        if (!item) return;
+
+        const history = getHistory();
+        const consultationId = parseInt(item.dataset.id, 10);
+        const consultation = history.find(c => c.id === consultationId);
+
+        if (consultation) {
+            resetApp(false); // Reseta a UI sem salvar a consulta atual (que já é uma do histórico)
+
+            transcriptionEl.innerHTML = consultation.transcription;
+            anamnesisEl.innerHTML = consultation.anamnesis;
+            examsSuggestionsEl.innerHTML = consultation.exams;
+            prescriptionSuggestionsEl.innerHTML = consultation.prescription;
+            improvementsEl.innerHTML = consultation.improvements;
+            timerDisplayEl.textContent = consultation.duration;
+            originalTranscriptionText = transcriptionEl.textContent; // Para permitir refinamento
+
+            applyMethod(consultation.method);
+            applySpecialty(consultation.specialty);
+
+            // Mostra as seções relevantes
+            refineSection.classList.remove('hidden');
+            improvementSection.classList.remove('hidden');
+            examsSection.classList.remove('hidden');
+            prescriptionSection.classList.remove('hidden');
+            timerDisplayEl.classList.remove('hidden');
+
+            isConsultationComplete = true;
+            statusEl.textContent = `Consulta de ${new Date(consultation.id).toLocaleString('pt-BR')} carregada.`;
+            updateButtonsUI();
+            historyModal.close();
+        }
+    }
+
+    function clearHistory() {
+        if (confirm('Tem certeza que deseja apagar permanentemente todo o histórico de consultas? Esta ação não pode ser desfeita.')) {
+            localStorage.removeItem(CONSULTATION_HISTORY_KEY);
+            displayHistory(); // Atualiza a exibição do modal (agora vazio)
+        }
+    }
+
+
     // === FUNÇÕES DO CONTADOR DE GRAVAÇÃO ===
     function formatTime(totalSeconds) {
         const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
@@ -1009,10 +1220,14 @@
     resumeButton.addEventListener('click', resumeRecording);
     sendButton.addEventListener('click', stopAndSend);
     refineButton.addEventListener('click', handleRefinement);
-    resetButton.addEventListener('click', resetApp); // NOVO
+    resetButton.addEventListener('click', () => resetApp(true)); // [MODIFICADO] Passa 'true' para indicar que deve salvar
 
-    // [NOVA FUNÇÃO] para resetar o estado da aplicação
-    function resetApp() {
+    // [FUNÇÃO MODIFICADA] para resetar o estado da aplicação
+    function resetApp(saveCurrent = false) {
+        if (saveCurrent) {
+            saveConsultationToHistory();
+        }
+
         isRecording = false;
         isPaused = false;
         isConsultationComplete = false;
@@ -1054,7 +1269,7 @@
     async function startRecording() {
       // Se não for uma continuação, limpa tudo.
       if (!isConsultationComplete) {
-        resetApp(); // Usa a função de reset para garantir um estado limpo
+        resetApp(false); // Usa a função de reset para garantir um estado limpo
       } else {
         // Se for continuação, apenas prepara para nova gravação sem limpar a tela
         audioChunks = [];
@@ -1148,7 +1363,6 @@
         loader.classList.add('hidden');
         statusEl.classList.remove('hidden');
         sendButton.disabled = false;
-        // Não chama updateButtonsUI aqui, pois é chamado no final de callGeminiAPI
       }
     }
 
@@ -1200,7 +1414,6 @@
             `;
         }
 
-        // [LÓGICA ALTERADA] O prompt agora muda se for uma continuação
         let initialPromptInstruction;
         if (isConsultationComplete && originalTranscriptionText) {
             initialPromptInstruction = `
@@ -1280,7 +1493,7 @@
             const prescriptionText = (fullResponse.split('--- SUGESTAO DE PRESCRICAO ---')[1] || '').split('--- PONTOS DE MELHORIA ---')[0] || 'Nenhuma sugestão de prescrição.';
             const improvementsText = (fullResponse.split('--- PONTOS DE MELHORIA ---')[1] || 'Nenhum ponto de melhoria identificado.').trim();
             
-            originalTranscriptionText = transcriptionText; // Atualiza a transcrição base
+            originalTranscriptionText = transcriptionText;
             transcriptionEl.innerHTML = transcriptionText || 'Não foi possível extrair a transcrição.';
             anamnesisEl.innerHTML = anamnesisText.trim();
             examsSuggestionsEl.innerHTML = examsText.trim();
@@ -1295,7 +1508,6 @@
             const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
             statusEl.textContent = `Processo concluído em ${processingTime} segundos! Pronto para revisão.`;
 
-            // [LÓGICA ALTERADA] Marca a consulta como completa e atualiza a UI
             isConsultationComplete = true;
             stopEstimationCountdown();
             updateButtonsUI();
@@ -1305,7 +1517,7 @@
             console.error("Erro na chamada da API:", err);
             statusEl.textContent = `Erro ao comunicar com a API do Gemini.`;
             anamnesisEl.innerHTML = '<span class="placeholder">Falha ao gerar a anamnese.</span>';
-            isConsultationComplete = false; // Falhou, então não está completa
+            isConsultationComplete = false;
             stopEstimationCountdown();
             updateButtonsUI();
         }
