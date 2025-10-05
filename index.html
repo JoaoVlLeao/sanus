@@ -118,19 +118,31 @@
         z-index: 5;
     }
     
-    /* === [NOVO] AGRUPADOR PARA BOTÕES DO CABEÇALHO === */
-    .header-controls {
-        position: absolute;
-        top: 24px;
-        right: 24px;
+    /* === [NOVO/AJUSTADO] CONTAINER PARA CONTROLES SUPERIORES === */
+    .top-controls-wrapper {
+        display: flex;
+        flex-wrap: wrap; /* Permite que os botões quebrem para a linha de baixo em telas muito pequenas */
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 16px; /* Adiciona espaço antes do logo */
+        position: relative;
         z-index: 10;
+    }
+
+    /* === [NOVO] AGRUPADOR PARA BOTÕES DO CABEÇALHO (MODIFICADO) === */
+    .header-controls {
+        /* position: absolute; <-- REMOVIDO */
+        /* top: 24px; <-- REMOVIDO */
+        /* right: 24px; <-- REMOVIDO */
+        /* z-index: 10; <-- REMOVIDO */
         display: flex;
         gap: 12px;
     }
 
     /* SELETOR DE TEMAS ESTILO GAVETA (MODIFICADO) */
     .theme-drawer {
-        position: relative; /* Mudou de absolute */
+        position: relative;
     }
 
     .theme-toggle-btn, .history-btn { /* Estilo unificado */
@@ -188,12 +200,13 @@
     .theme-dot[data-theme="forest"] { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
     .theme-dot[data-theme="dark-rose"] { background: linear-gradient(135deg, #e83e8c 0%, #6f42c1 100%); }
 
-    /* === [NOVO] SELETOR DE MÉTODO DE ANAMNESE === */
+    /* === [NOVO] SELETOR DE MÉTODO DE ANAMNESE (MODIFICADO) === */
     .method-drawer {
-        position: absolute;
-        top: 24px;
-        left: 24px;
-        z-index: 10;
+        /* position: absolute; <-- REMOVIDO */
+        /* top: 24px; <-- REMOVIDO */
+        /* left: 24px; <-- REMOVIDO */
+        /* z-index: 10; <-- REMOVIDO */
+        position: relative; /* Adicionado para garantir o posicionamento do dropdown */
     }
     .method-toggle-btn {
         background: rgba(255, 255, 255, 0.1);
@@ -244,9 +257,9 @@
 
 
     .header {
-      text-align: center;
-      margin-bottom: 24px; /* Ajustado */
-      margin-top: 48px; /* Adicionado para não sobrepor os botões */
+        text-align: center;
+        margin-bottom: 24px; /* Ajustado */
+        /* margin-top: 48px; <-- REMOVIDO */
     }
 
     .header h1 {
@@ -642,25 +655,27 @@
 
   <div class="container">
     
-    <div class="method-drawer">
-      <button class="method-toggle-btn">Método: Tradicional</button>
-      <div class="method-options hidden">
-        <div class="method-option active" data-method="tradicional">Anamnese Tradicional</div>
-        <div class="method-option" data-method="soap">Prontuário S.O.A.P.</div>
-      </div>
-    </div>
-    
-    <div class="header-controls">
-        <button class="history-btn" id="historyButton">Histórico</button>
-        <div class="theme-drawer">
-            <button class="theme-toggle-btn">Trocar tema</button>
-            <div class="theme-options hidden">
-                <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
-                <span class="theme-dot" data-theme="default" title="Padrão"></span>
-                <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
-                <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
-                <span class="theme-dot" data-theme="forest" title="Floresta"></span>
-                <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+    <div class="top-controls-wrapper">
+        <div class="method-drawer">
+            <button class="method-toggle-btn">Método: Tradicional</button>
+            <div class="method-options hidden">
+                <div class="method-option active" data-method="tradicional">Anamnese Tradicional</div>
+                <div class="method-option" data-method="soap">Prontuário S.O.A.P.</div>
+            </div>
+        </div>
+        
+        <div class="header-controls">
+            <button class="history-btn" id="historyButton">Histórico</button>
+            <div class="theme-drawer">
+                <button class="theme-toggle-btn">Trocar tema</button>
+                <div class="theme-options hidden">
+                    <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
+                    <span class="theme-dot" data-theme="default" title="Padrão"></span>
+                    <span class="theme-dot" data-theme="sunset" title="Pôr do Sol"></span>
+                    <span class="theme-dot" data-theme="ocean" title="Oceano"></span>
+                    <span class="theme-dot" data-theme="forest" title="Floresta"></span>
+                    <span class="theme-dot" data-theme="dark-rose" title="Rosa Escuro"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -1284,7 +1299,7 @@
         mediaRecorder.onstop = processAudio;
         
         // Zera o timer para a nova gravação
-        accumulatedTime = 0; 
+        accumulatedTime = 0;  
         startTimer();
         
         mediaRecorder.start();
