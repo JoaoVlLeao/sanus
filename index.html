@@ -117,7 +117,7 @@
         z-index: 5;
     }
     
-    /* === [AJUSTE] ESTRUTURA DO TOPO COM MENU DE AÇÕES === */
+    /* === [AJUSTE] ESTRUTURA DO TOPO COM MENU E BOTÃO DE HISTÓRICO === */
     .top-controls {
       display: flex;
       justify-content: space-between;
@@ -125,12 +125,28 @@
       margin-bottom: 24px;
     }
     
-    /* Novo Menu de Ações (Direita) */
-    .actions-drawer {
+    /* Botão de Histórico (Direita) */
+    .history-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    .history-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Novo Menu de Configurações (Esquerda) */
+    .settings-drawer {
       position: relative;
     }
 
-    .actions-toggle-btn {
+    .settings-toggle-btn {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid var(--border-color);
       color: var(--text-color);
@@ -144,20 +160,20 @@
       transition: background-color 0.3s ease;
     }
 
-    .actions-toggle-btn:hover {
+    .settings-toggle-btn:hover {
       background: rgba(255, 255, 255, 0.2);
     }
 
-    .actions-toggle-btn svg {
+    .settings-toggle-btn svg {
       width: 20px;
       height: 20px;
     }
 
-    .actions-options {
+    .settings-options {
       position: absolute;
       top: calc(100% + 8px);
-      right: 0;
-      width: 200px;
+      left: 0;
+      width: 240px;
       background: var(--background-color-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
@@ -169,37 +185,40 @@
       gap: 4px;
     }
 
-    /* Estilo para botões dentro do novo menu */
-    .actions-options .history-btn {
-      background: transparent;
-      border: none;
-      width: 100%;
-      padding: 10px 12px;
-      text-align: left;
-      font-weight: 500;
-      border-radius: 8px;
-    }
-
-    .actions-options .history-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    /* Estilo para a seção de temas dentro do novo menu */
-    .theme-selector-container {
-      padding: 10px 12px;
-    }
-
-    .theme-selector-title {
-      font-size: 0.9rem;
+    .settings-options .settings-title {
+      font-size: 0.8rem;
       font-weight: 600;
       color: var(--text-color);
-      opacity: 0.9;
-      margin-bottom: 12px;
+      opacity: 0.7;
+      padding: 8px 12px 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Estilos para as opções dentro do menu */
+    .settings-options .method-option {
+        padding: 10px 12px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    .settings-options .method-option:hover { background-color: rgba(255, 255, 255, 0.1); }
+    .settings-options .method-option.active {
+        background-color: var(--secondary-color);
+        color: #111;
+        font-weight: 700;
+    }
+
+    .theme-selector-container {
+      padding: 8px 12px 12px;
     }
 
     .theme-dots-wrapper {
       display: flex;
       justify-content: space-between;
+      margin-top: 8px;
     }
 
     .theme-dot {
@@ -220,53 +239,6 @@
     .theme-dot[data-theme="forest"] { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
     .theme-dot[data-theme="dark-rose"] { background: linear-gradient(135deg, #e83e8c 0%, #6f42c1 100%); }
 
-    /* Seletor de Método (Esquerda) */
-    .method-drawer { position: relative; }
-    
-    .method-toggle-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid var(--border-color);
-        color: var(--text-color);
-        padding: 8px 16px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-family: var(--font-family);
-        font-weight: 600;
-        transition: background 0.3s ease;
-        min-width: 180px;
-        text-align: center;
-    }
-    .method-toggle-btn:hover { background: rgba(255, 255, 255, 0.2); }
-
-    .method-options {
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 0;
-        background: var(--background-color-card);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        width: 100%;
-        z-index: 10;
-    }
-    .method-option {
-        padding: 10px 16px;
-        cursor: pointer;
-        border-radius: 8px;
-        transition: background-color 0.2s ease;
-        font-weight: 500;
-        color: var(--text-color);
-    }
-    .method-option:hover { background-color: rgba(255, 255, 255, 0.1); }
-    .method-option.active {
-        background-color: var(--secondary-color);
-        color: #111;
-        font-weight: 700;
-    }
 
     .header {
       text-align: center;
@@ -617,24 +589,20 @@
   <div class="container">
     
     <div class="top-controls">
-      <div class="method-drawer">
-        <button class="method-toggle-btn">Método: Tradicional</button>
-        <div class="method-options hidden">
-          <div class="method-option active" data-method="tradicional">Anamnese Tradicional</div>
-          <div class="method-option" data-method="soap">Prontuário S.O.A.P.</div>
-        </div>
-      </div>
-      
-      <div class="actions-drawer">
-        <button class="actions-toggle-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+      <div class="settings-drawer">
+        <button class="settings-toggle-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
           </svg>
         </button>
-        <div class="actions-options hidden">
-          <button class="history-btn" id="historyButton">Histórico</button>
+        <div class="settings-options hidden">
+          <div class="method-selector-container">
+            <div class="settings-title">Método de Anamnese</div>
+            <div class="method-option active" data-method="tradicional">Anamnese Tradicional</div>
+            <div class="method-option" data-method="soap">Prontuário S.O.A.P.</div>
+          </div>
           <div class="theme-selector-container">
-            <div class="theme-selector-title">Trocar Tema</div>
+            <div class="settings-title">Tema Visual</div>
             <div class="theme-dots-wrapper">
               <span class="theme-dot" data-theme="minty-pink" title="Verde & Rosa"></span>
               <span class="theme-dot" data-theme="default" title="Padrão"></span>
@@ -646,6 +614,8 @@
           </div>
         </div>
       </div>
+      
+      <button class="history-btn" id="historyButton">Histórico</button>
     </div>
 
 
@@ -822,10 +792,10 @@
     let anamnesisMethod = 'tradicional';
 
 
-    // === LÓGICA DE TEMAS E MENU DE AÇÕES ===
-    const actionsDrawer = document.querySelector('.actions-drawer');
-    const actionsToggleButton = document.querySelector('.actions-toggle-btn');
-    const actionsOptions = document.querySelector('.actions-options');
+    // === LÓGICA DE TEMAS E MENU DE CONFIGURAÇÕES ===
+    const settingsDrawer = document.querySelector('.settings-drawer');
+    const settingsToggleButton = document.querySelector('.settings-toggle-btn');
+    const settingsOptions = document.querySelector('.settings-options');
     const themeDots = document.querySelectorAll('.theme-dot');
     const bodyEl = document.body;
 
@@ -847,47 +817,42 @@
         localStorage.setItem('anamnesis_theme', themeName);
     }
     
-    // Listener para o botão do menu de ações
-    actionsToggleButton.addEventListener('click', () => actionsOptions.classList.toggle('hidden'));
-
-    // Listener dentro do menu de ações (para os temas)
-    actionsOptions.addEventListener('click', (e) => {
-        if (e.target.classList.contains('theme-dot')) {
-            applyTheme(e.target.dataset.theme);
-            // Opcional: fechar o menu ao selecionar um tema
-            // actionsOptions.classList.add('hidden');
-        }
-    });
-
-    // === LÓGICA DE MÉTODO DE ANAMNESE ===
-    const methodDrawer = document.querySelector('.method-drawer');
-    const methodToggleButton = document.querySelector('.method-toggle-btn');
-    const methodOptionsContainer = document.querySelector('.method-options');
-    const methodOptions = document.querySelectorAll('.method-option');
-
+    // Listener para o botão do menu de configurações
+    settingsToggleButton.addEventListener('click', () => settingsOptions.classList.toggle('hidden'));
+    
+    // === LÓGICA DE MÉTODO DE ANAMNESE (AGORA DENTRO DO MENU) ===
     function applyMethod(method) {
         anamnesisMethod = method;
+        const methodOptions = settingsOptions.querySelectorAll('.method-option');
         methodOptions.forEach(opt => {
             opt.classList.toggle('active', opt.dataset.method === method);
         });
 
         if (method === 'tradicional') {
-            methodToggleButton.textContent = 'Método: Tradicional';
             anamnesisTitleEl.textContent = 'Prontuário / Anamnese Estruturada';
         } else if (method === 'soap') {
-            methodToggleButton.textContent = 'Método: S.O.A.P.';
             anamnesisTitleEl.textContent = 'Prontuário Estruturado (S.O.A.P.)';
         }
         localStorage.setItem('anamnesis_method', method);
     }
-    methodToggleButton.addEventListener('click', () => methodOptionsContainer.classList.toggle('hidden'));
-    methodOptionsContainer.addEventListener('click', (e) => {
-        const targetOption = e.target.closest('.method-option');
-        if (targetOption) {
-            applyMethod(targetOption.dataset.method);
-            methodOptionsContainer.classList.add('hidden');
+    
+    // Listener unificado para cliques dentro do menu de configurações
+    settingsOptions.addEventListener('click', (e) => {
+        // Altera o método
+        const targetMethod = e.target.closest('.method-option');
+        if (targetMethod) {
+            applyMethod(targetMethod.dataset.method);
+            settingsOptions.classList.add('hidden'); // Fecha o menu ao selecionar
+            return;
+        }
+
+        // Altera o tema
+        const targetTheme = e.target.closest('.theme-dot');
+        if (targetTheme) {
+            applyTheme(targetTheme.dataset.theme);
         }
     });
+
 
     // === LÓGICA DO CONTEXTO CLÍNICO (ESPECIALIDADES) ===
     const specialtyDrawer = document.querySelector('.specialty-drawer');
@@ -941,11 +906,8 @@
 
     // Evento unificado para fechar todos os menus/gavetas ao clicar fora
     document.addEventListener('click', (e) => {
-        if (!actionsDrawer.contains(e.target) && !actionsOptions.classList.contains('hidden')) {
-            actionsOptions.classList.add('hidden');
-        }
-        if (!methodDrawer.contains(e.target) && !methodOptionsContainer.classList.contains('hidden')) {
-            methodOptionsContainer.classList.add('hidden');
+        if (!settingsDrawer.contains(e.target) && !settingsOptions.classList.contains('hidden')) {
+            settingsOptions.classList.add('hidden');
         }
         if (!specialtyDrawer.contains(e.target) && !specialtyOptionsContainer.classList.contains('hidden')) {
             specialtyOptionsContainer.classList.add('hidden');
