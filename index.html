@@ -100,6 +100,7 @@
       border: 1px solid var(--border-color);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      box-sizing: border-box; /* <<< CORREÇÃO APLICADA AQUI */
     }
     
     /* === [NOVO] ESTILO PARA O TEXTO DE CRÉDITO === */
@@ -641,6 +642,20 @@
       </div>
     </div>
 
+    <div id="examsSection" class="output-section hidden">
+      <h2>Sugestão de exames laboratoriais e de imagem</h2>
+      <div id="examsSuggestions" class="output-content">
+        <span class="placeholder">As sugestões de exames baseadas em evidências aparecerão aqui...</span>
+      </div>
+    </div>
+
+    <div id="prescriptionSection" class="output-section hidden">
+      <h2>Sugestão de prescrição de medicamento</h2>
+      <div id="prescriptionSuggestions" class="output-content">
+        <span class="placeholder">As sugestões de prescrição baseadas em evidências aparecerão aqui...</span>
+      </div>
+    </div>
+
     <div id="improvementSection" class="output-section hidden">
       <h2>Pontos a Melhorar/Acrescentar</h2>
       <div id="improvements" class="output-content">
@@ -679,6 +694,11 @@
     const anamnesisTitleEl = document.getElementById('anamnesisTitle');
     const improvementSection = document.getElementById('improvementSection');
     const improvementsEl = document.getElementById('improvements');
+    // NOVOS ELEMENTOS
+    const examsSection = document.getElementById('examsSection');
+    const examsSuggestionsEl = document.getElementById('examsSuggestions');
+    const prescriptionSection = document.getElementById('prescriptionSection');
+    const prescriptionSuggestionsEl = document.getElementById('prescriptionSuggestions');
 
 
     // === VARIÁVEIS DE ESTADO ===
@@ -978,8 +998,16 @@
       transcriptionEl.innerHTML = '<span class="placeholder">Aguardando transcrição...</span>';
       anamnesisEl.innerHTML = '<span class="placeholder">Aguardando anamnese...</span>';
       improvementsEl.innerHTML = '<span class="placeholder">Sugestões para aprimoramento da consulta aparecerão aqui...</span>';
+      // Limpa as novas seções
+      examsSuggestionsEl.innerHTML = '<span class="placeholder">As sugestões de exames baseadas em evidências aparecerão aqui...</span>';
+      prescriptionSuggestionsEl.innerHTML = '<span class="placeholder">As sugestões de prescrição baseadas em evidências aparecerão aqui...</span>';
+      
       refineSection.classList.add('hidden');
       improvementSection.classList.add('hidden');
+      // Esconde as novas seções
+      examsSection.classList.add('hidden');
+      prescriptionSection.classList.add('hidden');
+
       correctionsTextarea.value = '';
       refineStatusEl.textContent = ''; // Limpa o status de refinamento
       audioChunks = [];
@@ -1080,16 +1108,16 @@
         if (selectedPreset && selectedPreset.sources.length > 0) {
             const sourceList = selectedPreset.sources.map(s => `- ${s}`).join('\n');
             sourceInstruction = `
-            \n\n**DIRETRIZ ADICIONAL PARA PLANO TERAPÊUTICO E MELHORIAS:**
-            Baseie sua sugestão de plano terapêutico e os pontos de melhoria **prioritariamente** nas informações contidas na(s) fonte(s) mais relevante(s) da lista abaixo, que pertence ao contexto de "${selectedPreset.displayName}".
+            \n\n**DIRETRIZ ADICIONAL PARA SUGESTÕES E MELHORIAS:**
+            Baseie suas sugestões de exames, prescrição e pontos de melhoria **prioritariamente** nas informações contidas na(s) fonte(s) mais relevante(s) da lista abaixo, que pertence ao contexto de "${selectedPreset.displayName}".
             
             **Fontes Confiáveis Pré-selecionadas:**
             ${sourceList}
             `;
         } else {
             sourceInstruction = `
-            \n\n**DIRETRIZ ADICIONAL PARA PLANO TERAPÊUTICO E MELHORIAS:**
-            Crie um plano terapêutico e sugestões de melhoria baseados nas diretrizes atuais de maior evidência científica para o caso apresentado.
+            \n\n**DIRETRIZ ADICIONAL PARA SUGESTÕES E MELHORIAS:**
+            Crie um plano terapêutico, sugestões de exames, prescrições e melhorias baseados nas diretrizes atuais de maior evidência científica para o caso apresentado.
             `;
         }
         
@@ -1121,7 +1149,7 @@
 
         const prompt = `
           Você é um assistente médico altamente qualificado. Sua tarefa é analisar o áudio de uma consulta médica.
-          Execute as seguintes tarefas, em ordem:
+          Execute as seguintes tarefas, em ordem, usando os separadores exatos fornecidos:
 
           1.  **Transcrever a Conversa:**
               * Transcreva a conversa na íntegra, identificando <strong>Doutor:</strong> e <strong>Paciente:</strong>.
@@ -1129,9 +1157,24 @@
 
           2.  **Estruturar a Anamnese/Prontuário:**
               * Com base na transcrição, estruture um prontuário médico completo e profissional, seguindo o formato solicitado.
-              * Separe a transcrição do prontuário com o título "--- ANAMNESE ESTRUTURADA ---".
+              * Apresente o prontuário sob o título "--- ANAMNESE ESTRUTURADA ---".
 
-          3.  **Analisar Pontos de Melhoria:**
+          3.  **Sugerir Exames Laboratoriais e de Imagem:**
+              * Com base **exclusivamente** na(s) fonte(s) de referência, sugira exames relevantes.
+              * **Após cada exame**, cite a fonte em linha (ex: (Fonte: CAB nº37, Pág. 25)).
+              * Ao final, liste a(s) fonte(s) completa(s) em "<strong>Fontes das Sugestões de Exames:</strong>".
+              * Se nenhum for indicado, escreva "Nenhum exame específico sugerido com base nas fontes.".
+              * Apresente sob o título "--- SUGESTAO DE EXAMES ---".
+
+          4.  **Sugerir Prescrição de Medicamentos:**
+              * A **escolha do medicamento** deve ser baseada **exclusivamente** na(s) fonte(s) de referência.
+              * Para cada medicamento, pesquise em um bulário online e forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
+              * **Após cada prescrição**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
+              * Ao final, liste a(s) fonte(s) completa(s) em "<strong>Fontes das Sugestões de Prescrição:</strong>".
+              * Se nenhuma for indicada, escreva "Nenhuma prescrição específica sugerida com base nas fontes.".
+              * Apresente sob o título "--- SUGESTAO DE PRESCRICAO ---".
+
+          5.  **Analisar Pontos de Melhoria:**
               * Com base **exclusivamente** na lista de fontes de referência fornecida, analise a transcrição e identifique tópicos ou perguntas que o médico **não abordou**, mas que seriam relevantes.
               * Liste cada ponto de melhoria em formato de tópico (usando hífens).
               * **Após cada item**, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia). Exemplo: (Fonte: Pág. 72, CAB nº32).
@@ -1157,21 +1200,23 @@
             const data = await resp.json();
             const fullResponse = extractText(data);
             
-            const transcriptionParts = fullResponse.split('--- ANAMNESE ESTRUTURADA ---');
-            const transcriptionText = (transcriptionParts[0] || '').replace('--- TRANSCRIÇÃO ---', '').trim();
-            const anamnesisAndImprovementText = transcriptionParts[1] || '';
-
-            const anamnesisParts = anamnesisAndImprovementText.split('--- PONTOS DE MELHORIA ---');
-            const anamnesisText = (anamnesisParts[0] || 'O modelo não retornou uma anamnese estruturada.').trim();
-            const improvementsText = (anamnesisParts[1] || 'Nenhum ponto de melhoria identificado.').trim();
+            const transcriptionText = (fullResponse.split('--- ANAMNESE ESTRUTURADA ---')[0] || '').replace('--- TRANSCRIÇÃO ---', '').trim();
+            const anamnesisText = (fullResponse.split('--- ANAMNESE ESTRUTURADA ---')[1] || '').split('--- SUGESTAO DE EXAMES ---')[0] || 'O modelo não retornou uma anamnese.';
+            const examsText = (fullResponse.split('--- SUGESTAO DE EXAMES ---')[1] || '').split('--- SUGESTAO DE PRESCRICAO ---')[0] || 'Nenhuma sugestão de exame.';
+            const prescriptionText = (fullResponse.split('--- SUGESTAO DE PRESCRICAO ---')[1] || '').split('--- PONTOS DE MELHORIA ---')[0] || 'Nenhuma sugestão de prescrição.';
+            const improvementsText = (fullResponse.split('--- PONTOS DE MELHORIA ---')[1] || 'Nenhum ponto de melhoria identificado.').trim();
             
             originalTranscriptionText = transcriptionText;
             transcriptionEl.innerHTML = transcriptionText || 'Não foi possível extrair a transcrição.';
-            anamnesisEl.innerHTML = anamnesisText; 
+            anamnesisEl.innerHTML = anamnesisText.trim();
+            examsSuggestionsEl.innerHTML = examsText.trim();
+            prescriptionSuggestionsEl.innerHTML = prescriptionText.trim();
             improvementsEl.innerHTML = improvementsText;
             
             refineSection.classList.remove('hidden');
             improvementSection.classList.remove('hidden');
+            examsSection.classList.remove('hidden');
+            prescriptionSection.classList.remove('hidden');
 
             const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
             statusEl.textContent = `Processo concluído em ${processingTime} segundos! Pronto para revisão.`;
@@ -1213,16 +1258,16 @@
         if (selectedPreset && selectedPreset.sources.length > 0) {
             const sourceList = selectedPreset.sources.map(s => `- ${s}`).join('\n');
             sourceInstruction = `
-            \n\n**DIRETRIZ DE REFINAMENTO PARA PLANO TERAPÊUTICO E MELHORIAS:**
-            Ao refazer o plano terapêutico e os pontos de melhoria, analise e utilize prioritariamente a(s) fonte(s) mais relevante(s) da lista abaixo, que pertence ao contexto de "${selectedPreset.displayName}".
+            \n\n**DIRETRIZ DE REFINAMENTO PARA SUGESTÕES E MELHORIAS:**
+            Ao refazer as sugestões e melhorias, analise e utilize prioritariamente a(s) fonte(s) mais relevante(s) da lista abaixo, que pertence ao contexto de "${selectedPreset.displayName}".
             
             **Fontes Confiáveis Pré-selecionadas:**
             ${sourceList}
             `;
         } else {
             sourceInstruction = `
-            \n\n**DIRETRIZ DE REFINAMENTO PARA PLANO TERAPÊUTICO E MELHORIAS:**
-            Ao refazer o plano terapêutico e os pontos de melhoria, adicione sugestões de conduta baseadas no maior grau de evidência científica atual sobre o assunto da consulta.
+            \n\n**DIRETRIZ DE REFINAMENTO PARA SUGESTÕES E MELHORIAS:**
+            Ao refazer as sugestões e melhorias, adicione condutas baseadas no maior grau de evidência científica atual sobre o assunto da consulta.
             `;
         }
 
@@ -1253,9 +1298,9 @@
         }
 
         const prompt = `
-        Você é um assistente médico especialista. Sua tarefa é refazer um prontuário médico e sugerir melhorias.
-        Abaixo estão a transcrição ORIGINAL de uma consulta e as CORREÇÕES manuais feitas por um profissional de saúde.
-        Sua missão é gerar um NOVO prontuário estruturado, combinando as informações da transcrição original com as correções para garantir máxima precisão.
+        Você é um assistente médico especialista. Sua tarefa é refazer um prontuário médico completo com base em correções.
+        Abaixo estão a transcrição ORIGINAL de uma consulta e as CORREÇÕES manuais feitas por um profissional.
+        Sua missão é gerar um NOVO conjunto de documentos (prontuário, sugestões de exames, prescrição e melhorias), combinando as informações de ambas as fontes para garantir máxima precisão.
 
         --- TRANSCRIÇÃO ORIGINAL ---
         ${originalTranscriptionText}
@@ -1265,19 +1310,16 @@
 
         --- FIM DAS INFORMAÇÕES ---
 
-        **SUA TAREFA FINAL (em duas partes):**
+        **SUA TAREFA FINAL (em quatro partes):**
+        Use as informações combinadas para gerar o seguinte, na ordem exata e com os separadores:
 
-        **PARTE 1: Gerar o Prontuário Corrigido**
-        * Crie o prontuário final no formato solicitado abaixo, incorporando as correções.
-        
-        **PARTE 2: Analisar Pontos de Melhoria**
-        * Com base na transcrição, correções e fontes de referência, gere a seção "Pontos a Melhorar/Acrescentar".
-        * Identifique perguntas ou investigações que o médico poderia ter feito para aprofundar o caso.
-        * **Para cada ponto**, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
-        * Ao final de todos os pontos, adicione um item <strong>Fontes das Sugestões de Melhoria:</strong> e liste a(s) referência(s) completa(s) utilizada(s).
+        1.  **Gerar o Prontuário Corrigido**: Crie o prontuário final no formato solicitado, incorporando as correções.
+        2.  **Sugerir Exames (Corrigido)**: Gere a seção de sugestão de exames, seguindo as regras originais. Use o separador "--- SUGESTAO DE EXAMES ---".
+        3.  **Sugerir Prescrição (Corrigido)**: Gere a seção de prescrição, seguindo as regras originais. Use o separador "--- SUGESTAO DE PRESCRICAO ---".
+        4.  **Analisar Pontos de Melhoria (Corrigido)**: Gere a seção de melhorias, seguindo as regras originais. Use o separador "--- PONTOS DE MELHORIA ---".
 
         **FORMATO DA RESPOSTA (OBRIGATÓRIO):**
-        Entregue o prontuário corrigido primeiro, seguido pelo separador "--- PONTOS DE MELHORIA ---", e então a seção de pontos a melhorar.
+        Entregue o conteúdo na seguinte ordem, usando os separadores exatos: Prontuário, "--- SUGESTAO DE EXAMES ---", Exames, "--- SUGESTAO DE PRESCRICAO ---", Prescrição, "--- PONTOS DE MELHORIA ---", Pontos de Melhoria.
 
         **REGRAS DE FORMATAÇÃO (MUITO IMPORTANTE):**
         * **Negrito:** Use exclusivamente a tag HTML <strong>Negrito</strong>. **NUNCA** use asteriscos (**).
@@ -1298,13 +1340,16 @@
             const data = await resp.json();
             const fullResponse = extractText(data);
             
-            const parts = fullResponse.split('--- PONTOS DE MELHORIA ---');
-            const newAnamnesis = (parts[0] || 'O modelo não retornou um prontuário refeito.').trim();
-            const newImprovements = (parts[1] || 'Nenhum ponto de melhoria identificado.').trim();
+            const newAnamnesis = (fullResponse.split('--- SUGESTAO DE EXAMES ---')[0] || 'O modelo não retornou um prontuário refeito.').trim();
+            const newExams = (fullResponse.split('--- SUGESTAO DE EXAMES ---')[1] || '').split('--- SUGESTAO DE PRESCRICAO ---')[0] || 'Nenhuma sugestão de exame reanalisada.';
+            const newPrescriptions = (fullResponse.split('--- SUGESTAO DE PRESCRICAO ---')[1] || '').split('--- PONTOS DE MELHORIA ---')[0] || 'Nenhuma sugestão de prescrição reanalisada.';
+            const newImprovements = (fullResponse.split('--- PONTOS DE MELHORIA ---')[1] || 'Nenhum ponto de melhoria identificado na reanálise.').trim();
 
             anamnesisEl.innerHTML = newAnamnesis;
+            examsSuggestionsEl.innerHTML = newExams.trim();
+            prescriptionSuggestionsEl.innerHTML = newPrescriptions.trim();
             improvementsEl.innerHTML = newImprovements;
-            statusEl.textContent = "Prontuário refeito com sucesso a partir das suas correções!";
+            statusEl.textContent = "Prontuário e sugestões refeitos com sucesso a partir das suas correções!";
 
         } catch (err) {
             console.error("Erro ao refazer anamnese:", err);
