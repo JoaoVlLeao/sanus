@@ -16,6 +16,7 @@
       --accent-color-stop: #ff4b2b;
       --success-color: #28a745;
       --warning-color: #ffc107;
+      --info-color: #17a2b8; /* Cor para o botão de reset */
       --text-color: #e0e0e0;
       --background-color-main: #121212;
       --background-color-card: rgba(30, 30, 30, 0.7);
@@ -341,6 +342,7 @@
       justify-content: center;
       align-items: center;
       gap: 16px;
+      flex-wrap: wrap; /* Permite que os botões quebrem a linha */
     }
 
     .recorder-controls button {
@@ -395,6 +397,11 @@
     /* Estilos específicos dos botões */
     #recordButton {
       background: linear-gradient(45deg, var(--accent-color-start), var(--accent-color-stop));
+    }
+
+    /* [NOVO] Estilo para o botão de Reset */
+    #resetButton {
+      background-color: var(--info-color);
     }
 
     #pauseButton, #resumeButton {
@@ -592,6 +599,14 @@
         <span>Gravar Consulta</span>
       </button>
 
+      <button id="resetButton" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        <span>Nova Consulta (Reset)</span>
+      </button>
+
       <button id="pauseButton" class="hidden">
        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
         <span>Pausar</span>
@@ -679,6 +694,7 @@
     const pauseButton = document.getElementById('pauseButton');
     const resumeButton = document.getElementById('resumeButton');
     const sendButton = document.getElementById('sendButton');
+    const resetButton = document.getElementById('resetButton'); // NOVO
     const statusEl = document.getElementById('status');
     const transcriptionEl = document.getElementById('transcription');
     const anamnesisEl = document.getElementById('anamnesis');
@@ -704,6 +720,7 @@
     // === VARIÁVEIS DE ESTADO ===
     let isRecording = false;
     let isPaused = false;
+    let isConsultationComplete = false; // NOVO: Controla o estado da consulta
     let mediaRecorder;
     let audioChunks = [];
     let audioContext;
@@ -717,7 +734,7 @@
     let estimationInterval = null;
     let estimatedProcessTime = 0;
     let processingStartTime = 0;
-    let originalTranscriptionText = '';
+    let originalTranscriptionText = ''; // Armazena a transcrição para refinamento ou adição
     let anamnesisMethod = 'tradicional';
 
 
@@ -977,7 +994,7 @@
           timeLeft--;
         }
       }
-      update(); 
+      update();  
       estimationInterval = setInterval(update, 1000);
     }
     function stopEstimationCountdown() {
@@ -986,31 +1003,63 @@
       estimationTimerEl.textContent = '';
     }
 
-    // === LÓGICA PRINCIPAL DE GRAVAÇÃO ===
+    // === LÓGICA PRINCIPAL DE GRAVAÇÃO E CONTROLES ===
     recordButton.addEventListener('click', startRecording);
     pauseButton.addEventListener('click', pauseRecording);
     resumeButton.addEventListener('click', resumeRecording);
     sendButton.addEventListener('click', stopAndSend);
     refineButton.addEventListener('click', handleRefinement);
+    resetButton.addEventListener('click', resetApp); // NOVO
+
+    // [NOVA FUNÇÃO] para resetar o estado da aplicação
+    function resetApp() {
+        isRecording = false;
+        isPaused = false;
+        isConsultationComplete = false;
+        audioChunks = [];
+        originalTranscriptionText = '';
+        if (timerInterval) stopTimer();
+        accumulatedTime = 0;
+
+        // Limpa todas as saídas e restaura placeholders
+        const placeholderTranscription = '<span class="placeholder">A transcrição da conversa aparecerá aqui...</span>';
+        const placeholderAnamnesis = '<span class="placeholder">A anamnese formatada aparecerá aqui...</span>';
+        const placeholderExams = '<span class="placeholder">As sugestões de exames baseadas em evidências aparecerão aqui...</span>';
+        const placeholderPrescription = '<span class="placeholder">As sugestões de prescrição baseadas em evidências aparecerão aqui...</span>';
+        const placeholderImprovements = '<span class="placeholder">Sugestões para aprimoramento da consulta aparecerão aqui...</span>';
+
+        transcriptionEl.innerHTML = placeholderTranscription;
+        anamnesisEl.innerHTML = placeholderAnamnesis;
+        examsSuggestionsEl.innerHTML = placeholderExams;
+        prescriptionSuggestionsEl.innerHTML = placeholderPrescription;
+        improvementsEl.innerHTML = placeholderImprovements;
+        
+        // Esconde seções
+        refineSection.classList.add('hidden');
+        improvementSection.classList.add('hidden');
+        examsSection.classList.add('hidden');
+        prescriptionSection.classList.add('hidden');
+        timerDisplayEl.classList.add('hidden');
+        
+        // Reseta status
+        statusEl.textContent = 'Clique no botão "Gravar Consulta" para iniciar.';
+        correctionsTextarea.value = '';
+        refineStatusEl.textContent = '';
+
+        // Atualiza a UI dos botões para o estado inicial
+        updateButtonsUI();
+    }
 
 
     async function startRecording() {
-      transcriptionEl.innerHTML = '<span class="placeholder">Aguardando transcrição...</span>';
-      anamnesisEl.innerHTML = '<span class="placeholder">Aguardando anamnese...</span>';
-      improvementsEl.innerHTML = '<span class="placeholder">Sugestões para aprimoramento da consulta aparecerão aqui...</span>';
-      // Limpa as novas seções
-      examsSuggestionsEl.innerHTML = '<span class="placeholder">As sugestões de exames baseadas em evidências aparecerão aqui...</span>';
-      prescriptionSuggestionsEl.innerHTML = '<span class="placeholder">As sugestões de prescrição baseadas em evidências aparecerão aqui...</span>';
-      
-      refineSection.classList.add('hidden');
-      improvementSection.classList.add('hidden');
-      // Esconde as novas seções
-      examsSection.classList.add('hidden');
-      prescriptionSection.classList.add('hidden');
-
-      correctionsTextarea.value = '';
-      refineStatusEl.textContent = ''; // Limpa o status de refinamento
-      audioChunks = [];
+      // Se não for uma continuação, limpa tudo.
+      if (!isConsultationComplete) {
+        resetApp(); // Usa a função de reset para garantir um estado limpo
+      } else {
+        // Se for continuação, apenas prepara para nova gravação sem limpar a tela
+        audioChunks = [];
+        statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
+      }
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1018,12 +1067,17 @@
         mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
         mediaRecorder.onstop = processAudio;
-        accumulatedTime = 0;
+        
+        // Zera o timer para a nova gravação
+        accumulatedTime = 0; 
         startTimer();
+        
         mediaRecorder.start();
         isRecording = true;
         updateButtonsUI();
-        statusEl.textContent = 'Gravando... Fale agora.';
+        if (!isConsultationComplete) {
+          statusEl.textContent = 'Gravando... Fale agora.';
+        }
       } catch (err) {
         console.error("Erro ao acessar o microfone:", err);
         statusEl.textContent = 'Erro! Não foi possível acessar o microfone. Verifique as permissões.';
@@ -1094,8 +1148,7 @@
         loader.classList.add('hidden');
         statusEl.classList.remove('hidden');
         sendButton.disabled = false;
-        updateButtonsUI();
-        stopEstimationCountdown();
+        // Não chama updateButtonsUI aqui, pois é chamado no final de callGeminiAPI
       }
     }
 
@@ -1147,16 +1200,37 @@
             `;
         }
 
+        // [LÓGICA ALTERADA] O prompt agora muda se for uma continuação
+        let initialPromptInstruction;
+        if (isConsultationComplete && originalTranscriptionText) {
+            initialPromptInstruction = `
+            Você é um assistente médico que está atualizando uma consulta em andamento.
+            Abaixo está a transcrição da **primeira parte** da consulta.
+            --- TRANSCRIÇÃO ANTERIOR ---
+            ${originalTranscriptionText}
+            --- FIM DA TRANSCRIÇÃO ANTERIOR ---
+            
+            Sua tarefa é analisar o **novo áudio** fornecido e **integrar as novas informações** com os dados da transcrição anterior para gerar um conjunto de documentos **COMPLETO e ATUALIZADO**.
+            Você deve gerar UMA nova transcrição (combinando o antigo com o novo) e UMA nova anamnese e sugestões (com base em todas as informações combinadas).
+            Siga as tarefas abaixo, usando os separadores exatos fornecidos:
+            `;
+        } else {
+            initialPromptInstruction = `
+            Você é um assistente médico altamente qualificado. Sua tarefa é analisar o áudio de uma consulta médica.
+            Execute as seguintes tarefas, em ordem, usando os separadores exatos fornecidos:
+            `;
+        }
+
+
         const prompt = `
-          Você é um assistente médico altamente qualificado. Sua tarefa é analisar o áudio de uma consulta médica.
-          Execute as seguintes tarefas, em ordem, usando os separadores exatos fornecidos:
+          ${initialPromptInstruction}
 
           1.  **Transcrever a Conversa:**
-              * Transcreva a conversa na íntegra, identificando <strong>Doutor:</strong> e <strong>Paciente:</strong>.
+              * Transcreva a conversa na íntegra, identificando <strong>Doutor:</strong> e <strong>Paciente:</strong>. Se estiver atualizando, combine a transcrição anterior com a nova de forma coesa.
               * Apresente a transcrição completa sob o título "--- TRANSCRIÇÃO ---".
 
           2.  **Estruturar a Anamnese/Prontuário:**
-              * Com base na transcrição, estruture um prontuário médico completo e profissional, seguindo o formato solicitado.
+              * Com base na transcrição **completa**, estruture um prontuário médico completo e profissional, seguindo o formato solicitado.
               * Apresente o prontuário sob o título "--- ANAMNESE ESTRUTURADA ---".
 
           3.  **Sugerir Exames Laboratoriais e de Imagem:**
@@ -1206,7 +1280,7 @@
             const prescriptionText = (fullResponse.split('--- SUGESTAO DE PRESCRICAO ---')[1] || '').split('--- PONTOS DE MELHORIA ---')[0] || 'Nenhuma sugestão de prescrição.';
             const improvementsText = (fullResponse.split('--- PONTOS DE MELHORIA ---')[1] || 'Nenhum ponto de melhoria identificado.').trim();
             
-            originalTranscriptionText = transcriptionText;
+            originalTranscriptionText = transcriptionText; // Atualiza a transcrição base
             transcriptionEl.innerHTML = transcriptionText || 'Não foi possível extrair a transcrição.';
             anamnesisEl.innerHTML = anamnesisText.trim();
             examsSuggestionsEl.innerHTML = examsText.trim();
@@ -1221,10 +1295,19 @@
             const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
             statusEl.textContent = `Processo concluído em ${processingTime} segundos! Pronto para revisão.`;
 
+            // [LÓGICA ALTERADA] Marca a consulta como completa e atualiza a UI
+            isConsultationComplete = true;
+            stopEstimationCountdown();
+            updateButtonsUI();
+
+
         } catch (err) {
             console.error("Erro na chamada da API:", err);
             statusEl.textContent = `Erro ao comunicar com a API do Gemini.`;
             anamnesisEl.innerHTML = '<span class="placeholder">Falha ao gerar a anamnese.</span>';
+            isConsultationComplete = false; // Falhou, então não está completa
+            stopEstimationCountdown();
+            updateButtonsUI();
         }
     }
 
@@ -1391,15 +1474,30 @@
         try { return json.candidates[0].content.parts[0].text; } 
         catch (e) { console.error('Erro no parse da resposta da API', e, json); return 'Erro ao extrair texto da resposta.'; }
     }
+    
+    // [FUNÇÃO ALTERADA] para gerenciar o novo estado e o botão de reset
     function updateButtonsUI() {
         if (!isRecording) {
+            // Não está gravando
             recordButton.classList.remove('hidden');
             pauseButton.classList.add('hidden');
             resumeButton.classList.add('hidden');
             sendButton.classList.add('hidden');
+            
+            // Lógica para mostrar/esconder o botão de reset
+            if (isConsultationComplete) {
+                resetButton.classList.remove('hidden');
+                recordButton.querySelector('span').textContent = 'Gravar Adicional'; // Muda o texto do botão
+            } else {
+                resetButton.classList.add('hidden');
+                recordButton.querySelector('span').textContent = 'Gravar Consulta'; // Garante o texto original
+            }
         } else {
+            // Está gravando
             recordButton.classList.add('hidden');
+            resetButton.classList.add('hidden');
             sendButton.classList.remove('hidden');
+            
             if (isPaused) {
                 pauseButton.classList.add('hidden');
                 resumeButton.classList.remove('hidden');
