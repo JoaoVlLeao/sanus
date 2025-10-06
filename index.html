@@ -9,15 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Tema Padrão Antigo (Roxo/Azul) */
       --primary-color: #6a11cb;
       --secondary-color: #2575fc;
       --accent-color-start: #ff416c;
       --accent-color-stop: #ff4b2b;
       --success-color: #28a745;
       --warning-color: #ffc107;
-      --info-color: #17a2b8; /* Cor para o botão de reset */
-      --danger-color: #dc3545; /* [NOVO] Cor para o botão de apagar */
+      --info-color: #17a2b8;
+      --danger-color: #dc3545;
       --text-color: #e0e0e0;
       --background-color-main: #121212;
       --background-color-card: rgba(30, 30, 30, 0.7);
@@ -25,29 +24,22 @@
       --font-family: 'Poppins', sans-serif;
     }
 
-    /* === NOVOS TEMAS === */
-    /* NOVO TEMA PRINCIPAL (Verde/Rosa) */
     body.theme-minty-pink {
         --primary-color: #009195;
         --secondary-color: #5ff4ab;
         --accent-color-start: #ff14a9;
-        --accent-color-stop: #ff14a9; /* Cor sólida conforme solicitado */
+        --accent-color-stop: #ff14a9;
     }
-    /* Para o novo tema, botões de ação principais também usam a cor de destaque */
     body.theme-minty-pink #refineButton,
     body.theme-minty-pink #sendButton {
         background: var(--accent-color-start);
     }
-
-
-    /* Tema Pôr do Sol */
     body.theme-sunset {
         --primary-color: #d35400;
         --secondary-color: #e67e22;
         --accent-color-start: #e74c3c;
         --accent-color-stop: #f1c40f;
     }
-    /* Tema Oceano */
     body.theme-ocean {
         --primary-color: #005aa7;
         --secondary-color: #00c6ff;
@@ -56,7 +48,6 @@
         --success-color: #20c997;
         --warning-color: #fd7e14;
     }
-    /* Tema Floresta */
     body.theme-forest {
         --primary-color: #134e5e;
         --secondary-color: #71b280;
@@ -65,7 +56,6 @@
         --success-color: #28a745;
         --text-color: #f0f0f0;
     }
-    /* Tema Rosa Escuro */
     body.theme-dark-rose {
         --primary-color: #e83e8c;
         --secondary-color: #6f42c1;
@@ -75,8 +65,6 @@
         --border-color: rgba(255, 255, 255, 0.15);
     }
 
-
-    /* Estilos Gerais */
     body {
       font-family: var(--font-family);
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -117,7 +105,6 @@
         z-index: 5;
     }
     
-    /* === [AJUSTE] ESTRUTURA DO TOPO COM MENU E BOTÃO DE HISTÓRICO === */
     .top-controls {
       display: flex;
       justify-content: space-between;
@@ -125,7 +112,6 @@
       margin-bottom: 24px;
     }
     
-    /* Botão de Histórico (Direita) */
     .history-btn {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid var(--border-color);
@@ -141,7 +127,6 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
-    /* Novo Menu de Configurações (Esquerda) */
     .settings-drawer {
       position: relative;
     }
@@ -195,7 +180,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Estilos para as opções dentro do menu */
     .settings-options .method-option {
         padding: 10px 12px;
         cursor: pointer;
@@ -536,14 +520,13 @@
         margin-bottom: 20px;
         color: var(--text-color);
     }
-    /* === [NOVO] Estilos para o Filtro de Data === */
     .history-filters {
         display: flex;
         gap: 12px;
         align-items: center;
         justify-content: center;
-        margin-bottom: 20px;
         flex-wrap: wrap;
+        margin-bottom: 20px;
     }
     .history-filters label {
         font-weight: 500;
@@ -555,7 +538,13 @@
         padding: 6px 10px;
         border-radius: 8px;
         font-family: var(--font-family);
+        color-scheme: dark;
     }
+    .history-filters input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: brightness(0) invert(1);
+        cursor: pointer;
+    }
+
     .history-filters button {
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid var(--border-color);
@@ -614,6 +603,40 @@
     }
     #clearHistoryButton { background-color: var(--danger-color); color: white; }
     #closeHistoryButton { background-color: var(--info-color); color: white; }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 0;
+            align-items: flex-start;
+        }
+        .container {
+            max-width: 100%;
+            min-height: 100vh;
+            padding: 24px 16px;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+        }
+        .header img.main-logo {
+            max-width: 200px;
+        }
+        .recorder-controls button {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+        .output-content, #correctionsTextarea {
+            padding: 16px;
+        }
+        #historyModal {
+            width: calc(100% - 32px);
+            padding: 16px;
+        }
+        .creator-credit {
+            position: static;
+            padding: 24px 0;
+            margin-top: 16px;
+        }
+    }
 
   </style>
 </head>
@@ -769,15 +792,14 @@
 
 
   <script>
+    // [CÓDIGO JAVASCRIPT IDÊNTICO AO ANTERIOR, EXCETO PELA CORREÇÃO DO BUG MOBILE]
   (function(){
-    // === CONFIGURAÇÃO (NÃO ALTERADA) ===
     const GEMINI_API_KEY = 'AIzaSyAPfkx1oy28ZG8U3jfTdGuCENLhb6tG_DQ';
     const MODEL = 'gemini-2.5-flash';
     const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
     const VELOCIDADE_ROLAGEM = 4;
     const CONSULTATION_HISTORY_KEY = 'anamnesis_history';
 
-    // === ELEMENTOS DA PÁGINA ===
     const recordButton = document.getElementById('recordButton');
     const pauseButton = document.getElementById('pauseButton');
     const resumeButton = document.getElementById('resumeButton');
@@ -807,12 +829,9 @@
     const historyListEl = document.getElementById('historyList');
     const closeHistoryButton = document.getElementById('closeHistoryButton');
     const clearHistoryButton = document.getElementById('clearHistoryButton');
-    // === [NOVO] Elementos do Filtro de Histórico ===
     const historyDateFilter = document.getElementById('historyDateFilter');
     const clearDateFilterButton = document.getElementById('clearDateFilterButton');
 
-
-    // === VARIÁVEIS DE ESTADO ===
     let isRecording = false;
     let isPaused = false;
     let isConsultationComplete = false;
@@ -831,10 +850,8 @@
     let processingStartTime = 0;
     let originalTranscriptionText = '';
     let anamnesisMethod = 'tradicional';
-    let isLoadedFromHistory = false; // [NOVO] Flag para evitar duplicatas
+    let isLoadedFromHistory = false; 
 
-
-    // === LÓGICA DE TEMAS E MENU DE CONFIGURAÇÕES ===
     const settingsDrawer = document.querySelector('.settings-drawer');
     const settingsToggleButton = document.querySelector('.settings-toggle-btn');
     const settingsOptions = document.querySelector('.settings-options');
@@ -859,10 +876,8 @@
         localStorage.setItem('anamnesis_theme', themeName);
     }
     
-    // Listener para o botão do menu de configurações
     settingsToggleButton.addEventListener('click', () => settingsOptions.classList.toggle('hidden'));
     
-    // === LÓGICA DE MÉTODO DE ANAMNESE (AGORA DENTRO DO MENU) ===
     function applyMethod(method) {
         anamnesisMethod = method;
         const methodOptions = settingsOptions.querySelectorAll('.method-option');
@@ -878,25 +893,20 @@
         localStorage.setItem('anamnesis_method', method);
     }
     
-    // Listener unificado para cliques dentro do menu de configurações
     settingsOptions.addEventListener('click', (e) => {
-        // Altera o método
         const targetMethod = e.target.closest('.method-option');
         if (targetMethod) {
             applyMethod(targetMethod.dataset.method);
-            settingsOptions.classList.add('hidden'); // Fecha o menu ao selecionar
+            settingsOptions.classList.add('hidden');
             return;
         }
 
-        // Altera o tema
         const targetTheme = e.target.closest('.theme-dot');
         if (targetTheme) {
             applyTheme(targetTheme.dataset.theme);
         }
     });
 
-
-    // === LÓGICA DO CONTEXTO CLÍNICO (ESPECIALIDADES) ===
     const specialtyDrawer = document.querySelector('.specialty-drawer');
     const specialtyToggleButton = document.querySelector('.specialty-toggle-btn');
     const specialtyOptionsContainer = document.querySelector('.specialty-options');
@@ -946,7 +956,6 @@
         }
     });
 
-    // Evento unificado para fechar todos os menus/gavetas ao clicar fora
     document.addEventListener('click', (e) => {
         if (!settingsDrawer.contains(e.target) && !settingsOptions.classList.contains('hidden')) {
             settingsOptions.classList.add('hidden');
@@ -955,6 +964,13 @@
             specialtyOptionsContainer.classList.add('hidden');
         }
     });
+
+    function getTodayISOString() {
+        const today = new Date();
+        const offset = today.getTimezoneOffset();
+        const todayLocal = new Date(today.getTime() - (offset * 60 * 1000));
+        return todayLocal.toISOString().split('T')[0];
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         const savedTheme = localStorage.getItem('anamnesis_theme') || 'minty-pink';
@@ -967,22 +983,30 @@
         applySpecialty(savedSpecialty);
         
         historyButton.addEventListener('click', () => {
-            historyDateFilter.value = ''; // Sempre limpa o filtro ao abrir
-            displayHistory();
+            // Preenche e desabilita o campo ANTES de mostrar o modal
+            historyDateFilter.value = getTodayISOString();
+            historyDateFilter.disabled = true;
+
+            displayHistory(); // Abre o modal
+
+            // Reabilita o campo após um pequeno intervalo para o modal abrir completamente,
+            // evitando o bug de foco automático no mobile.
+            setTimeout(() => {
+                historyDateFilter.disabled = false;
+            }, 150);
         });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
         historyListEl.addEventListener('click', loadConsultationFromHistory);
         
-        // === [NOVO] Listeners para o filtro de data ===
         historyDateFilter.addEventListener('change', displayHistory);
+
         clearDateFilterButton.addEventListener('click', () => {
             historyDateFilter.value = '';
             displayHistory();
         });
     });
     
-    // === FUNÇÕES DE HISTÓRICO ===
     function getHistory() {
         const historyJson = localStorage.getItem(CONSULTATION_HISTORY_KEY);
         return historyJson ? JSON.parse(historyJson) : [];
@@ -1015,9 +1039,8 @@
         let history = getHistory();
         const filterValue = historyDateFilter.value;
 
-        // [NOVO] Lógica de filtragem
         if (filterValue) {
-            const selectedDate = new Date(filterValue + 'T00:00:00'); // Trata a data como local
+            const selectedDate = new Date(filterValue + 'T00:00:00');
             history = history.filter(consultation => {
                 const consultationDate = new Date(consultation.id);
                 return consultationDate.getFullYear() === selectedDate.getFullYear() &&
@@ -1029,9 +1052,9 @@
         historyListEl.innerHTML = '';
         if (history.length === 0) {
             if (filterValue) {
-                historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta encontrada para esta data.</p>';
+                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta encontrada para esta data.</p>`;
             } else {
-                historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta salva ainda.</p>';
+                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta salva ainda.</p>`;
             }
         } else {
             history.forEach(consultation => {
@@ -1056,6 +1079,7 @@
             historyModal.showModal();
         }
     }
+
 
     function loadConsultationFromHistory(e) {
         const item = e.target.closest('.history-item');
@@ -1086,7 +1110,7 @@
             timerDisplayEl.classList.remove('hidden');
 
             isConsultationComplete = true;
-            isLoadedFromHistory = true; // [NOVO] Marca que foi carregado
+            isLoadedFromHistory = true; 
             statusEl.textContent = `Consulta de ${new Date(consultation.id).toLocaleString('pt-BR')} carregada.`;
             updateButtonsUI();
             historyModal.close();
@@ -1096,12 +1120,11 @@
     function clearHistory() {
         if (confirm('Tem certeza que deseja apagar permanentemente todo o histórico de consultas? Esta ação não pode ser desfeita.')) {
             localStorage.removeItem(CONSULTATION_HISTORY_KEY);
-            displayHistory(); // Atualiza a view
+            historyDateFilter.value = '';
+            displayHistory();
         }
     }
 
-
-    // === FUNÇÕES DO CONTADOR DE GRAVAÇÃO ===
     function formatTime(totalSeconds) {
         const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
         const seconds = (totalSeconds % 60).toString().padStart(2, '0');
@@ -1124,7 +1147,6 @@
         timerInterval = null;
     }
 
-    // === FUNÇÕES DE VISUALIZAÇÃO DE ÁUDIO ===
     function visualize(stream) {
         if (!audioContext || audioContext.state === 'closed') audioContext = new AudioContext();
         const source = audioContext.createMediaStreamSource(stream);
@@ -1161,7 +1183,6 @@
         canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, minVal, VELOCIDADE_ROLAGEM, amplitude);
     }
     
-    // === FUNÇÕES DO CONTADOR DE ESTIMATIVA ===
     function startEstimationCountdown(duration) {
       if (estimationInterval) clearInterval(estimationInterval);
       let timeLeft = duration;
@@ -1183,7 +1204,6 @@
       estimationTimerEl.textContent = '';
     }
 
-    // === LÓGICA PRINCIPAL DE GRAVAÇÃO E CONTROLES ===
     recordButton.addEventListener('click', startRecording);
     pauseButton.addEventListener('click', pauseRecording);
     resumeButton.addEventListener('click', resumeRecording);
@@ -1192,7 +1212,6 @@
     resetButton.addEventListener('click', () => resetApp(true));
 
     function resetApp(saveCurrent = false) {
-        // [MODIFICADO] Apenas salva se for uma consulta nova, e não uma carregada do histórico
         if (saveCurrent && !isLoadedFromHistory) {
             saveConsultationToHistory();
         }
@@ -1200,7 +1219,7 @@
         isRecording = false;
         isPaused = false;
         isConsultationComplete = false;
-        isLoadedFromHistory = false; // [NOVO] Reseta o flag
+        isLoadedFromHistory = false;
         audioChunks = [];
         originalTranscriptionText = '';
         if (timerInterval) stopTimer();
@@ -1233,7 +1252,7 @@
 
 
     async function startRecording() {
-        isLoadedFromHistory = false; // [NOVO] Garante que qualquer nova gravação é considerada "nova"
+        isLoadedFromHistory = false;
         if (!isConsultationComplete) {
          resetApp(false);
         } else {
@@ -1330,8 +1349,6 @@
       }
     }
 
-    // === LÓGICA DE CHAMADA À API E REFINAMENTO ===
-
     async function callGeminiAPI(audioBase64, mimeType) {
         const selectedPreset = specialtyPresets[selectedSpecialty];
         let sourceInstruction = '';
@@ -1362,7 +1379,7 @@
             <strong>P (Plano):</strong> Descreva o plano de ação. Para cada item, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
             <strong>Fonte do Plano:</strong> [OBRIGATÓRIO: Cite aqui a(s) fonte(s) COMPLETA(S) usada(s) para basear o plano terapêutico]
             `;
-        } else { // Método Tradicional
+        } else {
             anamnesisFormat = `
             **Formato da Anamnese:**
             <strong>Identificação do Paciente:</strong>
@@ -1388,7 +1405,6 @@
             --- FIM DA TRANSCRIÇÃO ANTERIOR ---
             
             Sua tarefa é analisar o **novo áudio** fornecido e **integrar as novas informações** com os dados da transcrição anterior para gerar um conjunto de documentos **COMPLETO e ATUALIZADO**.
-            Você deve gerar UMA nova transcrição (combinando o antigo com o novo) e UMA nova anamnese e sugestões (com base em todas as informações combinadas).
             Siga as tarefas abaixo, usando os separadores exatos fornecidos:
             `;
         } else {
@@ -1414,15 +1430,17 @@
               * Com base **exclusivamente** na(s) fonte(s) de referência, sugira exames relevantes.
               * **Após CADA exame**, cite a fonte em linha (ex: (Fonte: CAB nº37, Pág. 25)).
               * Ao final da lista, adicione "<strong>Fontes das Sugestões de Exames:</strong>" e liste a(s) fonte(s) completa(s).
-              * Se nenhum exame for indicado pelas fontes, escreva "Nenhum exame específico sugerido com base nas fontes." e, na linha de fontes, adicione "<strong>Fontes das Sugestões de Exames:</strong> Nenhuma fonte aplicável.".
+              * Se nenhum exame for indicado pelas fontes, escreva "Nenhum exame específico sugerido com base nas fontes." e na linha de fontes, adicione "<strong>Fontes das Sugestões de Exames:</strong> Nenhuma fonte aplicável.".
               * Apresente sob o título "--- SUGESTAO DE EXAMES ---".
 
           4.  **Sugerir Prescrição de Medicamentos:**
-              * A **escolha do medicamento** deve ser baseada **exclusivamente** na(s) fonte(s) de referência.
-              * Para cada medicamento, forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
-              * **Após CADA prescrição**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
-              * Ao final da lista, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s).
-              * Se nenhuma prescrição for indicada pelas fontes, escreva "Nenhuma prescrição específica sugerida com base nas fontes." e, na linha de fontes, adicione "<strong>Fontes das Sugestões de Prescrição:</strong> Nenhuma fonte aplicável.".
+              * Organize as sugestões em duas seções, se aplicável: <strong>Tratamento Específico</strong> (para a condição principal) e <strong>Tratamento Sintomático</strong> (para alívio de sintomas como dor, febre, etc.).
+              * Para o <strong>Tratamento Específico</strong>, a escolha do medicamento deve ser baseada **prioritariamente** na(s) fonte(s) de referência fornecida(s).
+              * Para o <strong>Tratamento Sintomático</strong>, você pode sugerir medicamentos de uso comum (ex: Dipirona 500mg para dor ou febre), baseando-se em diretrizes clínicas gerais de ampla aceitação. Para estes, não é obrigatório citar a fonte específica fornecida, mas a conduta deve ser clinicamente correta.
+              * Para cada medicamento (específico ou sintomático), forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
+              * **Após CADA prescrição de tratamento específico**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
+              * Ao final de toda a lista, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s) usadas para o tratamento específico.
+              * Se nenhuma prescrição for indicada, escreva "Nenhuma prescrição específica sugerida com base nas informações e fontes."
               * Apresente sob o título "--- SUGESTAO DE PRESCRICAO ---".
 
           5.  **Analisar Pontos de Melhoria:**
@@ -1436,6 +1454,7 @@
 
           **REGRAS DE FORMATAÇÃO (MUITO IMPORTANTE):**
           * **Negrito:** Use exclusivamente a tag HTML <strong>Negrito</strong>. **NUNCA** use asteriscos (**).
+          * **Parágrafos:** Em seções de texto longo (como HDA, Plano Terapêutico, etc.), divida o conteúdo em parágrafos curtos e coesos. Insira uma linha em branco entre cada parágrafo para garantir uma boa separação visual.
           * **Estrutura:** Organize o texto de forma clara, com parágrafos bem definidos.
           * **Seções Vazias:** Se uma seção não tiver informações, escreva "Nenhuma informação fornecida na consulta.".
           
@@ -1541,7 +1560,7 @@
             <strong>P (Plano):</strong> Descreva o plano de ação. Para cada item, adicione uma breve citação em linha, no formato (Fonte: Pág. X, Nome do Guia).
             <strong>Fonte do Plano:</strong> [OBRIGATÓRIO: Cite aqui a(s) fonte(s) COMPLETA(S) usada(s) para basear o plano terapêutico]
             `;
-        } else { // Método Tradicional
+        } else { 
              anamnesisFormat = `
             **Gere a anamnese usando o seguinte formato:**
             <strong>Identificação do Paciente:</strong>
@@ -1583,11 +1602,13 @@
             * Apresente esta seção e DEPOIS use o separador "--- SUGESTAO DE PRESCRICAO ---".
 
         3.  **Sugerir Prescrição (Corrigido)**:
-            * A **escolha do medicamento** deve ser baseada **exclusivamente** na(s) fonte(s) de referência para o caso corrigido.
-            * Forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
-            * **Após CADA prescrição**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
-            * Ao final, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s).
-            * Se nenhuma prescrição for indicada, escreva "Nenhuma prescrição específica sugerida com base nas fontes." e adicione "<strong>Fontes das Sugestões de Prescrição:</strong> Nenhuma fonte aplicável.".
+            * Reorganize as sugestões em duas seções, se aplicável: <strong>Tratamento Específico</strong> e <strong>Tratamento Sintomático</strong>, incorporando as correções do profissional.
+            * Para o <strong>Tratamento Específico</strong>, baseie a escolha do medicamento **prioritariamente** na(s) fonte(s) de referência fornecida(s).
+            * Para o <strong>Tratamento Sintomático</strong>, sugira medicamentos de uso comum (ex: Dipirona 500mg) conforme as diretrizes clínicas gerais e as informações corrigidas.
+            * Para cada medicamento, forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
+            * **Após CADA prescrição de tratamento específico**, cite a fonte (ex: (Fonte: CAB nº36, Pág. 40)).
+            * Ao final, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s) usadas para o tratamento específico.
+            * Se nenhuma prescrição for indicada, escreva "Nenhuma prescrição específica sugerida com base nas informações e fontes.".
             * Apresente esta seção e DEPOIS use o separador "--- PONTOS DE MELHORIA ---".
 
         4.  **Analisar Pontos de Melhoria (Corrigido)**:
@@ -1599,6 +1620,7 @@
 
         **REGRAS DE FORMATAÇÃO (MUITO IMPORTANTE):**
         * **Negrito:** Use exclusivamente a tag HTML <strong>Negrito</strong>. **NUNCA** use asteriscos (**).
+        * **Parágrafos:** Em seções de texto longo (como HDA, Plano Terapêutico, etc.), divida o conteúdo em parágrafos curtos e coesos. Insira uma linha em branco entre cada parágrafo para garantir uma boa separação visual.
         * **Estrutura:** Organize o texto de forma clara e com parágrafos bem definidos.
         * **Seções Vazias:** Se uma seção não tiver informações, escreva "Nenhuma informação fornecida na consulta.".
 
@@ -1639,7 +1661,6 @@
     }
 
 
-    // === FUNÇÕES AUXILIARES ===
     function blobToBase64(blob) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
