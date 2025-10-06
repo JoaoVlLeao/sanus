@@ -503,56 +503,59 @@
     .output-content .placeholder { color: #777; font-style: italic; }
 
     /* --- ESTILOS CORRIGIDOS PARA TRANSCRIÇÃO RECOLHÍVEL --- */
-    .collapsible .collapsible-header {
+    /* Por padrão, o botão da seta fica escondido */
+    .collapsible-header .toggle-btn {
+      display: none;
+    }
+
+    /* Quando a classe .collapsible-active é adicionada, a mágica acontece */
+    #transcriptionSection.collapsible-active .collapsible-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
     }
-    .collapsible .collapsible-header h2 {
+    #transcriptionSection.collapsible-active .collapsible-header h2 {
       margin-bottom: 0;
       border-bottom: none;
       padding-bottom: 0;
     }
-    .collapsible .collapsible-header .toggle-btn {
+    #transcriptionSection.collapsible-active .toggle-btn {
+      display: block;
       background: transparent;
       border: none;
       color: var(--text-color);
-      cursor: pointer;
       padding: 8px;
     }
-    .collapsible .collapsible-header .toggle-btn svg {
+    #transcriptionSection.collapsible-active .toggle-btn svg {
       width: 20px;
       height: 20px;
       transition: transform 0.3s ease;
-      transform: rotate(180deg); /* Seta para CIMA por padrão (expandido) */
+      transform: rotate(180deg); /* Estado expandido (seta para CIMA) */
     }
-    .collapsible .collapsible-content {
+    #transcriptionSection.collapsible-active.is-collapsed .toggle-btn svg {
+      transform: rotate(0deg); /* Estado recolhido (seta para BAIXO) */
+    }
+
+    /* Lógica para esconder/mostrar o conteúdo */
+    #transcriptionSection .collapsible-content {
+      transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, border-width 0.1s ease-out, opacity 0.4s ease-out;
       overflow: hidden;
-      transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, border-width 0.4s ease-out;
-      max-height: 1000px; /* Valor alto para estado expandido */
-      margin-top: 16px;
     }
-    .collapsible.is-collapsed {
-      margin-bottom: -16px; /* Compensa margem do h2 */
-    }
-    .collapsible.is-collapsed .collapsible-content {
+    #transcriptionSection.collapsible-active.is-collapsed .collapsible-content {
       max-height: 0;
       padding-top: 0;
       padding-bottom: 0;
       margin-top: 0;
       border-width: 0;
+      opacity: 0;
     }
-    .collapsible.is-collapsed .collapsible-header h2 {
+    #transcriptionSection.collapsible-active.is-collapsed .collapsible-header h2 {
       margin-bottom: 16px;
       border-bottom: 2px solid var(--secondary-color);
       padding-bottom: 8px;
     }
-    .collapsible.is-collapsed .toggle-btn svg {
-      transform: rotate(0deg); /* Seta para BAIXO quando recolhido */
-    }
     /* --- FIM DOS ESTILOS CORRIGIDOS --- */
-
 
     #historyModal {
         max-width: 600px;
@@ -779,7 +782,7 @@
       <p id="estimationTimer"></p>
     </div>
 
-    <div class="output-section collapsible" id="transcriptionSection">
+    <div class="output-section" id="transcriptionSection">
       <div class="collapsible-header">
           <h2>Transcrição da Consulta</h2>
           <button class="toggle-btn">
@@ -792,6 +795,8 @@
         <span class="placeholder">A transcrição da conversa aparecerá aqui...</span>
       </div>
     </div>
+
+
     <div id="refineSection" class="output-section hidden">
         <h2>Correções e Adições Manuais</h2>
         <textarea id="correctionsTextarea" placeholder="Se a transcrição contiver erros, digite as correções ou informações adicionais aqui... Por exemplo: 'O paciente mencionou febre de 38.5 graus, não 37.5.'"></textarea>
@@ -1060,7 +1065,9 @@
 
         const collapsibleHeader = transcriptionSection.querySelector('.collapsible-header');
         collapsibleHeader.addEventListener('click', () => {
-            transcriptionSection.classList.toggle('is-collapsed');
+            if (transcriptionSection.classList.contains('collapsible-active')) {
+                transcriptionSection.classList.toggle('is-collapsed');
+            }
         });
     });
     
@@ -1165,6 +1172,8 @@
             examsSection.classList.remove('hidden');
             prescriptionSection.classList.remove('hidden');
             timerDisplayEl.classList.remove('hidden');
+            
+            transcriptionSection.classList.add('collapsible-active');
             transcriptionSection.classList.add('is-collapsed'); 
 
             isConsultationComplete = true;
@@ -1300,6 +1309,8 @@
         examsSection.classList.add('hidden');
         prescriptionSection.classList.add('hidden');
         timerDisplayEl.classList.add('hidden');
+
+        transcriptionSection.classList.remove('collapsible-active');
         transcriptionSection.classList.remove('is-collapsed');
         
         statusEl.textContent = 'Clique no botão "Gravar Consulta" para iniciar.';
@@ -1309,9 +1320,7 @@
         updateButtonsUI();
     }
 
-    // NOVA FUNÇÃO para verificar a permissão do microfone de forma inteligente
     async function checkAndRequestMicrophonePermission() {
-        // Se a API de Permissões não for suportada, prossegue e deixa o getUserMedia lidar
         if (!navigator.permissions) {
             console.warn("API de Permissões não suportada. Prosseguindo diretamente...");
             return true;
@@ -1320,29 +1329,26 @@
             const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
             
             if (permissionStatus.state === 'granted') {
-                return true; // Permissão já concedida
+                return true;
             }
             
             if (permissionStatus.state === 'denied') {
                 statusEl.textContent = 'Permissão de microfone bloqueada. Habilite-a nas configurações do site (ícone de cadeado).';
-                return false; // Permissão negada, não continuar
+                return false;
             }
 
-            // Se o estado for 'prompt', o getUserMedia irá solicitar, então podemos prosseguir
             return true;
         } catch (e) {
             console.error('Erro ao verificar permissão do microfone:', e);
             statusEl.textContent = 'Erro ao verificar permissões.';
-            return false; // Erro, não continuar
+            return false;
         }
     }
 
-
-    // FUNÇÃO startRecording ATUALIZADA com a verificação de permissão
     async function startRecording() {
         const canProceed = await checkAndRequestMicrophonePermission();
         if (!canProceed) {
-            return; // Interrompe a execução se a permissão foi negada ou deu erro
+            return;
         }
 
         isLoadedFromHistory = false;
@@ -1598,6 +1604,8 @@
             improvementSection.classList.remove('hidden');
             examsSection.classList.remove('hidden');
             prescriptionSection.classList.remove('hidden');
+            
+            transcriptionSection.classList.add('collapsible-active');
             transcriptionSection.classList.add('is-collapsed');
 
             const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
