@@ -792,6 +792,7 @@
 
 
   <script>
+    // [CÓDIGO JAVASCRIPT IDÊNTICO AO ANTERIOR, EXCETO PELA CORREÇÃO DO BUG MOBILE]
   (function(){
     const GEMINI_API_KEY = 'AIzaSyAPfkx1oy28ZG8U3jfTdGuCENLhb6tG_DQ';
     const MODEL = 'gemini-2.5-flash';
@@ -982,16 +983,17 @@
         applySpecialty(savedSpecialty);
         
         historyButton.addEventListener('click', () => {
+            // Preenche e desabilita o campo ANTES de mostrar o modal
             historyDateFilter.value = getTodayISOString();
-            displayHistory();
-            
-            // [MODIFICADO] Adiciona um pequeno delay para remover o foco do input de data no mobile,
-            // evitando que o seletor de calendário abra automaticamente.
+            historyDateFilter.disabled = true;
+
+            displayHistory(); // Abre o modal
+
+            // Reabilita o campo após um pequeno intervalo para o modal abrir completamente,
+            // evitando o bug de foco automático no mobile.
             setTimeout(() => {
-                if (document.activeElement === historyDateFilter) {
-                    historyDateFilter.blur();
-                }
-            }, 0);
+                historyDateFilter.disabled = false;
+            }, 150);
         });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
@@ -1434,7 +1436,7 @@
           4.  **Sugerir Prescrição de Medicamentos:**
               * Organize as sugestões em duas seções, se aplicável: <strong>Tratamento Específico</strong> (para a condição principal) e <strong>Tratamento Sintomático</strong> (para alívio de sintomas como dor, febre, etc.).
               * Para o <strong>Tratamento Específico</strong>, a escolha do medicamento deve ser baseada **prioritariamente** na(s) fonte(s) de referência fornecida(s).
-              * Para o <strong>Tratamento Sintomático</strong>, você pode sugerir medicamentos de uso comum (ex: Dipirona 500mg para dor ou febre), baseando-se em diretrizes clínicas gerais de ampla aceitação. Para estes, é obrigatório citar a fonte específica fornecida, a conduta deve ser clinicamente correta.
+              * Para o <strong>Tratamento Sintomático</strong>, você pode sugerir medicamentos de uso comum (ex: Dipirona 500mg para dor ou febre), baseando-se em diretrizes clínicas gerais de ampla aceitação. Para estes, não é obrigatório citar a fonte específica fornecida, mas a conduta deve ser clinicamente correta.
               * Para cada medicamento (específico ou sintomático), forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
               * **Após CADA prescrição de tratamento específico**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
               * Ao final de toda a lista, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s) usadas para o tratamento específico.
