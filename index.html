@@ -93,17 +93,17 @@
       box-sizing: border-box;
     }
     
-    .creator-credit {
-        position: absolute;
-        bottom: 10px;
-        left: auto;
-        transform: none;
-        font-size: 0.75rem;
-        color: var(--text-color);
-        opacity: 0.6;
-        font-weight: 400;
-        z-index: 5;
-    }
+.creator-credit {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    font-weight: 400;
+    z-index: 5;
+}
     
     .top-controls {
       display: flex;
@@ -445,7 +445,7 @@
       line-height: 1.7;
       color: #dcdcdc;
     }
-	
+
     #correctionsTextarea {
         width: 100%;
         box-sizing: border-box;
@@ -625,11 +625,19 @@
         padding: 12px 16px;
         margin-bottom: 10px;
         border-radius: 10px;
-        cursor: pointer;
         transition: background-color 0.2s ease, transform 0.2s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .history-item-content {
+        flex-grow: 1;
+        cursor: pointer;
     }
     .history-item:hover {
         background-color: rgba(255, 255, 255, 0.1);
+    }
+    .history-item-content:hover {
         transform: translateX(4px);
     }
     .history-item-date {
@@ -640,6 +648,29 @@
     .history-item-details {
         font-size: 0.85rem;
         opacity: 0.8;
+    }
+    .delete-history-item-btn {
+        background: var(--danger-color);
+        border: none;
+        color: white;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        line-height: 1;
+        margin-left: 12px;
+        flex-shrink: 0;
+        transition: all 0.2s;
+        padding-bottom: 2px;
+    }
+    .delete-history-item-btn:hover {
+        background-color: #c82333;
+        transform: scale(1.1);
     }
     .modal-actions {
         margin-top: 24px;
@@ -689,11 +720,12 @@
             width: calc(100% - 32px);
             padding: 16px;
         }
-        .creator-credit {
-            position: static;
-            padding: 24px 0;
-            margin-top: auto;
-            text-align: center;
+    .creator-credit {
+        position: static;
+        padding: 24px 0;
+        margin-top: auto;
+        text-align: center;
+        transform: none; /* <-- Adicione esta linha */
         }
     }
 
@@ -802,7 +834,7 @@
 
     <div id="refineSection" class="output-section hidden">
         <h2>Correções e Adições Manuais</h2>
-        <textarea id="correctionsTextarea" placeholder="Se a transcrição contiver erros, digite as correções ou informações adicionais aqui... Por exemplo: 'Febre de 38.5 graus, não 37.5.'"></textarea>
+        <textarea id="correctionsTextarea" placeholder="Se a transcrição contiver erros, digite as correções ou informações adicionais aqui... Por exemplo: 'O paciente mencionou febre de 38.5 graus, não 37.5.'"></textarea>
         <div class="refine-controls">
             <button id="refineButton">Refazer Prontuário com Correções</button>
             <p id="refineStatus"></p>
@@ -1058,7 +1090,24 @@
         });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
-        historyListEl.addEventListener('click', loadConsultationFromHistory);
+        
+        // >>> MODIFICAÇÃO: Listener de evento combinado para carregar e deletar
+        historyListEl.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.delete-history-item-btn');
+            if (deleteButton) {
+                const idToDelete = parseInt(deleteButton.dataset.id, 10);
+                if (confirm('Tem certeza que deseja apagar esta consulta do histórico?')) {
+                    deleteHistoryItem(idToDelete);
+                }
+                return;
+            }
+            
+            if (e.target.closest('.history-item-content')) {
+                 loadConsultationFromHistory(e);
+            }
+        });
+        // Fim da modificação >>>
+
         historyDateFilter.addEventListener('change', displayHistory);
         clearDateFilterButton.addEventListener('click', () => {
             historyDateFilter.value = '';
@@ -1132,12 +1181,17 @@
                 const methodName = consultation.method === 'soap' ? 'S.O.A.P.' : 'Tradicional';
                 const specialtyName = specialtyPresets[consultation.specialty]?.displayName || 'Padrão';
 
+                // >>> MODIFICAÇÃO: Adicionado botão de deletar
                 item.innerHTML = `
-                    <span class="history-item-date">${date}</span>
-                    <span class="history-item-details">
-                        Duração: ${consultation.duration} | Método: ${methodName} | Contexto: ${specialtyName}
-                    </span>
+                    <div class="history-item-content">
+                      <span class="history-item-date">${date}</span>
+                      <span class="history-item-details">
+                          Duração: ${consultation.duration} | Método: ${methodName} | Contexto: ${specialtyName}
+                      </span>
+                    </div>
+                    <button class="delete-history-item-btn" data-id="${consultation.id}" title="Excluir consulta">&times;</button>
                 `;
+                // Fim da modificação <<<
                 historyListEl.appendChild(item);
             });
         }
@@ -1146,9 +1200,20 @@
         }
     }
 
+    // >>> NOVIDADE: Função para deletar um item específico
+    function deleteHistoryItem(idToDelete) {
+        let history = getHistory();
+        const updatedHistory = history.filter(c => c.id !== idToDelete);
+        localStorage.setItem(CONSULTATION_HISTORY_KEY, JSON.stringify(updatedHistory));
+        displayHistory(); 
+    }
+    // Fim da novidade <<<
 
     function loadConsultationFromHistory(e) {
-        const item = e.target.closest('.history-item');
+        const itemContent = e.target.closest('.history-item-content');
+        if (!itemContent) return;
+        
+        const item = itemContent.closest('.history-item');
         if (!item) return;
 
         const history = getHistory();
