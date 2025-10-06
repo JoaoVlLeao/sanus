@@ -548,7 +548,7 @@
     #transcriptionSection.collapsible-active.is-collapsed .collapsible-header {
         border-bottom: 2px solid var(--secondary-color);
         padding-bottom: 8px;
-        margin-bottom: 0; /* Correção do espaçamento */
+        margin-bottom: 12px; /* <<< ALTERAÇÃO: Reduz o espaçamento inferior */
     }
     /* --- FIM DOS ESTILOS --- */
 
@@ -1148,7 +1148,7 @@
         const consultation = history.find(c => c.id === consultationId);
 
         if (consultation) {
-            resetApp(false);
+            resetApp();
 
             transcriptionEl.innerHTML = consultation.transcription;
             anamnesisEl.innerHTML = consultation.anamnesis;
@@ -1186,61 +1186,61 @@
     }
 
     function formatTime(totalSeconds) {
-        const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-        return `${minutes}:${seconds}`;
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+      const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+      return `${minutes}:${seconds}`;
     }
     function updateTimer() {
-        const elapsedTimeSinceStart = Date.now() - startTime;
-        const totalElapsedTime = accumulatedTime + elapsedTimeSinceStart;
-        const totalSeconds = Math.floor(totalElapsedTime / 1000);
-        timerDisplayEl.textContent = formatTime(totalSeconds);
+      const elapsedTimeSinceStart = Date.now() - startTime;
+      const totalElapsedTime = accumulatedTime + elapsedTimeSinceStart;
+      const totalSeconds = Math.floor(totalElapsedTime / 1000);
+      timerDisplayEl.textContent = formatTime(totalSeconds);
     }
     function startTimer() {
-        timerDisplayEl.classList.remove('hidden');
-        startTime = Date.now();
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(updateTimer, 1000);
+      timerDisplayEl.classList.remove('hidden');
+      startTime = Date.now();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
     }
     function stopTimer() {
-        clearInterval(timerInterval);
-        timerInterval = null;
+      clearInterval(timerInterval);
+      timerInterval = null;
     }
 
     function visualize(stream) {
-        if (!audioContext || audioContext.state === 'closed') audioContext = new AudioContext();
-        const source = audioContext.createMediaStreamSource(stream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-        source.connect(analyser);
-        const bodyStyles = window.getComputedStyle(bodyEl);
-        const bgColor = bodyStyles.getPropertyValue('--background-color-card');
-        canvasCtx.fillStyle = bgColor;
-        canvasCtx.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
-        visualizerCanvas.classList.remove('hidden');
-        drawWave();
+      if (!audioContext || audioContext.state === 'closed') audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      bufferLength = analyser.frequencyBinCount;
+      dataArray = new Uint8Array(bufferLength);
+      source.connect(analyser);
+      const bodyStyles = window.getComputedStyle(bodyEl);
+      const bgColor = bodyStyles.getPropertyValue('--background-color-card');
+      canvasCtx.fillStyle = bgColor;
+      canvasCtx.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+      visualizerCanvas.classList.remove('hidden');
+      drawWave();
     }
     function drawWave() {
-        animationFrameId = requestAnimationFrame(drawWave);
-        canvasCtx.drawImage(visualizerCanvas, -VELOCIDADE_ROLAGEM, 0);
-        analyser.getByteTimeDomainData(dataArray);
-        let min = 128, max = 128;
-        for (let i = 0; i < bufferLength; i++) {
-            if (dataArray[i] < min) min = dataArray[i];
-            if (dataArray[i] > max) max = dataArray[i];
-        }
-        const minVal = (min / 255) * visualizerCanvas.height;
-        const maxVal = (max / 255) * visualizerCanvas.height;
-        const amplitude = Math.max(1, maxVal - minVal);
-        const bodyStyles = window.getComputedStyle(bodyEl);
-        const bgColor = bodyStyles.getPropertyValue('--background-color-card');
-        const waveColor = bodyStyles.getPropertyValue('--secondary-color');
-        canvasCtx.fillStyle = bgColor;
-        canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, 0, VELOCIDADE_ROLAGEM, visualizerCanvas.height);
-        canvasCtx.fillStyle = waveColor.trim();
-        canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, minVal, VELOCIDADE_ROLAGEM, amplitude);
+      animationFrameId = requestAnimationFrame(drawWave);
+      canvasCtx.drawImage(visualizerCanvas, -VELOCIDADE_ROLAGEM, 0);
+      analyser.getByteTimeDomainData(dataArray);
+      let min = 128, max = 128;
+      for (let i = 0; i < bufferLength; i++) {
+        if (dataArray[i] < min) min = dataArray[i];
+        if (dataArray[i] > max) max = dataArray[i];
+      }
+      const minVal = (min / 255) * visualizerCanvas.height;
+      const maxVal = (max / 255) * visualizerCanvas.height;
+      const amplitude = Math.max(1, maxVal - minVal);
+      const bodyStyles = window.getComputedStyle(bodyEl);
+      const bgColor = bodyStyles.getPropertyValue('--background-color-card');
+      const waveColor = bodyStyles.getPropertyValue('--secondary-color');
+      canvasCtx.fillStyle = bgColor;
+      canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, 0, VELOCIDADE_ROLAGEM, visualizerCanvas.height);
+      canvasCtx.fillStyle = waveColor.trim();
+      canvasCtx.fillRect(visualizerCanvas.width - VELOCIDADE_ROLAGEM, minVal, VELOCIDADE_ROLAGEM, amplitude);
     }
     
     function startEstimationCountdown(duration) {
@@ -1269,13 +1269,9 @@
     resumeButton.addEventListener('click', resumeRecording);
     sendButton.addEventListener('click', stopAndSend);
     refineButton.addEventListener('click', handleRefinement);
-    resetButton.addEventListener('click', () => resetApp(true));
+    resetButton.addEventListener('click', () => resetApp());
 
-    function resetApp(saveCurrent = false) {
-        if (saveCurrent && !isLoadedFromHistory) {
-            saveConsultationToHistory();
-        }
-
+    function resetApp() {
         isRecording = false;
         isPaused = false;
         isConsultationComplete = false;
@@ -1345,7 +1341,7 @@
 
         isLoadedFromHistory = false;
         if (!isConsultationComplete) {
-            resetApp(false);
+            resetApp();
         } else {
             audioChunks = [];
             statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
@@ -1585,10 +1581,9 @@
             const prescriptionText = (fullResponse.split('--- SUGESTAO DE PRESCRICAO ---')[1] || '').split('--- PONTOS DE MELHORIA ---')[0] || 'Nenhuma sugestão de prescrição.';
             const improvementsText = (fullResponse.split('--- PONTOS DE MELHORIA ---')[1] || 'Nenhum ponto de melhoria identificado.').trim();
 
-            // Ativa e recolhe a transcrição ANTES de popular o conteúdo
-            transcriptionSection.classList.add('collapsible-active');
-            transcriptionSection.classList.add('is-collapsed');
-            
+            const content = transcriptionSection.querySelector('.collapsible-content');
+            content.style.transition = 'none'; // Desativa a transição temporariamente
+
             originalTranscriptionText = transcriptionText;
             transcriptionEl.innerHTML = transcriptionText || 'Não foi possível extrair a transcrição.';
             anamnesisEl.innerHTML = anamnesisText.trim();
@@ -1596,6 +1591,15 @@
             prescriptionSuggestionsEl.innerHTML = prescriptionText.trim();
             improvementsEl.innerHTML = improvementsText;
             
+            // <<< ALTERAÇÃO: Ativa e já recolhe a transcrição para que apareça fechada
+            transcriptionSection.classList.add('collapsible-active');
+            transcriptionSection.classList.add('is-collapsed');
+
+            // Força o navegador a aplicar os estilos sem transição
+            content.offsetHeight; 
+            // Reativa a transição para futuras interações do usuário
+            content.style.transition = '';
+
             refineSection.classList.remove('hidden');
             examsSection.classList.remove('hidden');
             prescriptionSection.classList.remove('hidden');
@@ -1607,6 +1611,9 @@
             isConsultationComplete = true;
             stopEstimationCountdown();
             updateButtonsUI();
+            
+            // <<< ALTERAÇÃO: Salva no histórico assim que o prontuário é gerado
+            saveConsultationToHistory();
 
         } catch (err) {
             console.error("Erro na chamada da API:", err);
