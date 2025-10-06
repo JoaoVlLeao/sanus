@@ -541,7 +541,8 @@
         color-scheme: dark;
     }
     .history-filters input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(1) brightness(1.2);
+        /* [MODIFICADO] Regra mais robusta para forçar o ícone a ficar branco */
+        filter: brightness(0) invert(1);
         cursor: pointer;
     }
 
@@ -604,7 +605,6 @@
     #clearHistoryButton { background-color: var(--danger-color); color: white; }
     #closeHistoryButton { background-color: var(--info-color); color: white; }
 
-    /* === ESTILOS PARA MOBILE === */
     @media (max-width: 768px) {
         body {
             padding: 0;
@@ -617,9 +617,6 @@
             border-radius: 0;
             border: none;
             box-shadow: none;
-            /* [CORRIGIDO] As linhas abaixo foram removidas para restaurar o fundo escuro no mobile */
-            /* background: transparent; */
-            /* backdrop-filter: none; */
         }
         .header img.main-logo {
             max-width: 200px;
@@ -796,15 +793,14 @@
 
 
   <script>
+    // [CÓDIGO JAVASCRIPT IDÊNTICO AO ANTERIOR - NENHUMA MUDANÇA FUNCIONAL FOI NECESSÁRIA]
   (function(){
-    // === CONFIGURAÇÃO (NÃO ALTERADA) ===
     const GEMINI_API_KEY = 'AIzaSyAPfkx1oy28ZG8U3jfTdGuCENLhb6tG_DQ';
     const MODEL = 'gemini-2.5-flash';
     const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
     const VELOCIDADE_ROLAGEM = 4;
     const CONSULTATION_HISTORY_KEY = 'anamnesis_history';
 
-    // === ELEMENTOS DA PÁGINA ===
     const recordButton = document.getElementById('recordButton');
     const pauseButton = document.getElementById('pauseButton');
     const resumeButton = document.getElementById('resumeButton');
@@ -837,8 +833,6 @@
     const historyDateFilter = document.getElementById('historyDateFilter');
     const clearDateFilterButton = document.getElementById('clearDateFilterButton');
 
-
-    // === VARIÁVEIS DE ESTADO ===
     let isRecording = false;
     let isPaused = false;
     let isConsultationComplete = false;
@@ -859,8 +853,6 @@
     let anamnesisMethod = 'tradicional';
     let isLoadedFromHistory = false; 
 
-
-    // === LÓGICA DE TEMAS E MENU DE CONFIGURAÇÕES ===
     const settingsDrawer = document.querySelector('.settings-drawer');
     const settingsToggleButton = document.querySelector('.settings-toggle-btn');
     const settingsOptions = document.querySelector('.settings-options');
@@ -915,7 +907,6 @@
             applyTheme(targetTheme.dataset.theme);
         }
     });
-
 
     const specialtyDrawer = document.querySelector('.specialty-drawer');
     const specialtyToggleButton = document.querySelector('.specialty-toggle-btn');
