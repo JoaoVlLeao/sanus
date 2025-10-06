@@ -1267,7 +1267,6 @@
          mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
          mediaRecorder.onstop = processAudio;
          
-         accumulatedTime = 0; 
          startTimer();
          
          mediaRecorder.start();
