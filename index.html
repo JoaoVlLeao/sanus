@@ -502,47 +502,42 @@
 
     .output-content .placeholder { color: #777; font-style: italic; }
 
-    /* --- ESTILOS CORRIGIDOS PARA TRANSCRIÇÃO RECOLHÍVEL --- */
-    /* Por padrão, o botão da seta fica escondido */
+    /* --- ESTILOS GERAIS PARA SEÇÕES RECOLHÍVEIS --- */
     .collapsible-header .toggle-btn {
-      display: none;
+      display: none; /* Escondido por padrão */
     }
-
-    /* Quando a classe .collapsible-active é adicionada, a mágica acontece */
-    #transcriptionSection.collapsible-active .collapsible-header {
+    .output-section.collapsible-active .collapsible-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
     }
-    #transcriptionSection.collapsible-active .collapsible-header h2 {
+    .output-section.collapsible-active .collapsible-header h2 {
       margin-bottom: 0;
       border-bottom: none;
       padding-bottom: 0;
     }
-    #transcriptionSection.collapsible-active .toggle-btn {
+    .output-section.collapsible-active .toggle-btn {
       display: block;
       background: transparent;
       border: none;
       color: var(--text-color);
       padding: 8px;
     }
-    #transcriptionSection.collapsible-active .toggle-btn svg {
+    .output-section.collapsible-active .toggle-btn svg {
       width: 20px;
       height: 20px;
       transition: transform 0.3s ease;
-      transform: rotate(180deg); /* Estado expandido (seta para CIMA) */
+      transform: rotate(180deg); /* Padrão: Aberto (seta para CIMA) */
     }
-    #transcriptionSection.collapsible-active.is-collapsed .toggle-btn svg {
-      transform: rotate(0deg); /* Estado recolhido (seta para BAIXO) */
+    .output-section.collapsible-active.is-collapsed .toggle-btn svg {
+      transform: rotate(0deg); /* Recolhido (seta para BAIXO) */
     }
-
-    /* Lógica para esconder/mostrar o conteúdo */
-    #transcriptionSection .collapsible-content {
+    .collapsible-content {
       transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, border-width 0.1s ease-out, opacity 0.4s ease-out;
       overflow: hidden;
     }
-    #transcriptionSection.collapsible-active.is-collapsed .collapsible-content {
+    .output-section.collapsible-active.is-collapsed .collapsible-content {
       max-height: 0;
       padding-top: 0;
       padding-bottom: 0;
@@ -550,12 +545,12 @@
       border-width: 0;
       opacity: 0;
     }
-    #transcriptionSection.collapsible-active.is-collapsed .collapsible-header h2 {
-      margin-bottom: 16px;
-      border-bottom: 2px solid var(--secondary-color);
-      padding-bottom: 8px;
+    .output-section.collapsible-active.is-collapsed .collapsible-header {
+        border-bottom: 2px solid var(--secondary-color);
+        padding-bottom: 8px;
+        margin-bottom: 24px;
     }
-    /* --- FIM DOS ESTILOS CORRIGIDOS --- */
+    /* --- FIM DOS ESTILOS --- */
 
     #historyModal {
         max-width: 600px;
@@ -782,7 +777,7 @@
       <p id="estimationTimer"></p>
     </div>
 
-    <div class="output-section" id="transcriptionSection">
+    <div class="output-section collapsible" id="transcriptionSection">
       <div class="collapsible-header">
           <h2>Transcrição da Consulta</h2>
           <button class="toggle-btn">
@@ -796,7 +791,6 @@
       </div>
     </div>
 
-
     <div id="refineSection" class="output-section hidden">
         <h2>Correções e Adições Manuais</h2>
         <textarea id="correctionsTextarea" placeholder="Se a transcrição contiver erros, digite as correções ou informações adicionais aqui... Por exemplo: 'O paciente mencionou febre de 38.5 graus, não 37.5.'"></textarea>
@@ -805,34 +799,53 @@
             <p id="refineStatus"></p>
         </div>
     </div>
-
-
-    <div class="output-section">
-      <h2 id="anamnesisTitle">Prontuário / Anamnese Estruturada</h2>
-      <div id="anamnesis" class="output-content">
-        <span class="placeholder">A anamnese formatada aparecerá aqui...</span>
-      </div>
+    
+    <div class="output-section collapsible" id="anamnesisContainerSection">
+        <div class="collapsible-header">
+            <h2 id="anamnesisTitle">Prontuário / Anamnese Estruturada</h2>
+            <button class="toggle-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+        </div>
+        <div id="anamnesis" class="output-content collapsible-content">
+            <span class="placeholder">A anamnese formatada aparecerá aqui...</span>
+        </div>
     </div>
 
-    <div id="examsSection" class="output-section hidden">
-      <h2>Sugestão de exames laboratoriais e de imagem</h2>
-      <div id="examsSuggestions" class="output-content">
-        <span class="placeholder">As sugestões de exames baseadas em evidências aparecerão aqui...</span>
-      </div>
+    <div class="output-section collapsible hidden" id="examsSection">
+        <div class="collapsible-header">
+            <h2>Sugestão de exames laboratoriais e de imagem</h2>
+            <button class="toggle-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+        </div>
+        <div id="examsSuggestions" class="output-content collapsible-content">
+            <span class="placeholder">As sugestões de exames baseadas em evidências aparecerão aqui...</span>
+        </div>
     </div>
 
-    <div id="prescriptionSection" class="output-section hidden">
-      <h2>Sugestão de prescrição de medicamento</h2>
-      <div id="prescriptionSuggestions" class="output-content">
-        <span class="placeholder">As sugestões de prescrição baseadas em evidências aparecerão aqui...</span>
-      </div>
+    <div class="output-section collapsible hidden" id="prescriptionSection">
+        <div class="collapsible-header">
+            <h2>Sugestão de prescrição de medicamento</h2>
+            <button class="toggle-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+        </div>
+        <div id="prescriptionSuggestions" class="output-content collapsible-content">
+            <span class="placeholder">As sugestões de prescrição baseadas em evidências aparecerão aqui...</span>
+        </div>
     </div>
 
-    <div id="improvementSection" class="output-section hidden">
-      <h2>Pontos a Melhorar/Acrescentar</h2>
-      <div id="improvements" class="output-content">
-        <span class="placeholder">Sugestões para aprimoramento da consulta aparecerão aqui...</span>
-      </div>
+    <div class="output-section collapsible hidden" id="improvementSection">
+        <div class="collapsible-header">
+            <h2>Pontos a Melhorar/Acrescentar</h2>
+            <button class="toggle-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+        </div>
+        <div id="improvements" class="output-content collapsible-content">
+            <span class="placeholder">Sugestões para aprimoramento da consulta aparecerão aqui...</span>
+        </div>
     </div>
 
     <div class="creator-credit"><strong>Feito por:</strong> João Victor Leão </div>
@@ -1063,11 +1076,13 @@
             displayHistory();
         });
 
-        const collapsibleHeader = transcriptionSection.querySelector('.collapsible-header');
-        collapsibleHeader.addEventListener('click', () => {
-            if (transcriptionSection.classList.contains('collapsible-active')) {
-                transcriptionSection.classList.toggle('is-collapsed');
-            }
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const parentSection = header.closest('.output-section');
+                if (parentSection.classList.contains('collapsible-active')) {
+                    parentSection.classList.toggle('is-collapsed');
+                }
+            });
         });
     });
     
@@ -1168,12 +1183,13 @@
             applySpecialty(consultation.specialty);
 
             refineSection.classList.remove('hidden');
-            improvementSection.classList.remove('hidden');
-            examsSection.classList.remove('hidden');
-            prescriptionSection.classList.remove('hidden');
-            timerDisplayEl.classList.remove('hidden');
             
-            transcriptionSection.classList.add('collapsible-active');
+            const collapsibleSections = document.querySelectorAll('.output-section.collapsible');
+            collapsibleSections.forEach(section => {
+                section.classList.remove('hidden');
+                section.classList.add('collapsible-active');
+            });
+
             transcriptionSection.classList.add('is-collapsed'); 
 
             isConsultationComplete = true;
@@ -1305,13 +1321,14 @@
         improvementsEl.innerHTML = placeholderImprovements;
         
         refineSection.classList.add('hidden');
-        improvementSection.classList.add('hidden');
         examsSection.classList.add('hidden');
         prescriptionSection.classList.add('hidden');
+        improvementSection.classList.add('hidden');
         timerDisplayEl.classList.add('hidden');
 
-        transcriptionSection.classList.remove('collapsible-active');
-        transcriptionSection.classList.remove('is-collapsed');
+        document.querySelectorAll('.output-section.collapsible').forEach(section => {
+            section.classList.remove('collapsible-active', 'is-collapsed');
+        });
         
         statusEl.textContent = 'Clique no botão "Gravar Consulta" para iniciar.';
         correctionsTextarea.value = '';
@@ -1601,11 +1618,15 @@
             improvementsEl.innerHTML = improvementsText;
             
             refineSection.classList.remove('hidden');
-            improvementSection.classList.remove('hidden');
-            examsSection.classList.remove('hidden');
-            prescriptionSection.classList.remove('hidden');
             
-            transcriptionSection.classList.add('collapsible-active');
+            const collapsibleSections = document.querySelectorAll('.output-section.collapsible');
+            collapsibleSections.forEach(section => {
+                section.classList.remove('hidden');
+                section.classList.add('collapsible-active');
+                if (section.id !== 'transcriptionSection') {
+                    section.classList.remove('is-collapsed');
+                }
+            });
             transcriptionSection.classList.add('is-collapsed');
 
             const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
