@@ -502,7 +502,7 @@
 
     .output-content .placeholder { color: #777; font-style: italic; }
 
-    /* --- NOVOS ESTILOS PARA TRANSCRIÇÃO RECOLHÍVEL --- */
+    /* --- ESTILOS CORRIGIDOS PARA TRANSCRIÇÃO RECOLHÍVEL --- */
     .collapsible .collapsible-header {
       display: flex;
       justify-content: space-between;
@@ -510,7 +510,7 @@
       cursor: pointer;
     }
     .collapsible .collapsible-header h2 {
-      margin-bottom: 0; /* Remove a margem original para alinhar com o botão */
+      margin-bottom: 0;
       border-bottom: none;
       padding-bottom: 0;
     }
@@ -525,12 +525,16 @@
       width: 20px;
       height: 20px;
       transition: transform 0.3s ease;
+      transform: rotate(180deg); /* Seta para CIMA por padrão (expandido) */
     }
     .collapsible .collapsible-content {
       overflow: hidden;
-      transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out;
-      max-height: 1000px; /* Um valor alto para o estado expandido */
+      transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, border-width 0.4s ease-out;
+      max-height: 1000px; /* Valor alto para estado expandido */
       margin-top: 16px;
+    }
+    .collapsible.is-collapsed {
+      margin-bottom: -16px; /* Compensa margem do h2 */
     }
     .collapsible.is-collapsed .collapsible-content {
       max-height: 0;
@@ -540,14 +544,14 @@
       border-width: 0;
     }
     .collapsible.is-collapsed .collapsible-header h2 {
-      margin-bottom: 16px; /* Adiciona margem inferior quando recolhido */
+      margin-bottom: 16px;
       border-bottom: 2px solid var(--secondary-color);
       padding-bottom: 8px;
     }
     .collapsible.is-collapsed .toggle-btn svg {
-      transform: rotate(-90deg);
+      transform: rotate(0deg); /* Seta para BAIXO quando recolhido */
     }
-    /* --- FIM DOS NOVOS ESTILOS --- */
+    /* --- FIM DOS ESTILOS CORRIGIDOS --- */
 
 
     #historyModal {
@@ -846,7 +850,6 @@
 
 
   <script>
-    // [CÓDIGO JAVASCRIPT IDÊNTICO AO ANTERIOR, EXCETO PELA CORREÇÃO DO BUG MOBILE]
   (function(){
     const GEMINI_API_KEY = 'AIzaSyAPfkx1oy28ZG8U3jfTdGuCENLhb6tG_DQ';
     const MODEL = 'gemini-2.5-flash';
@@ -1055,7 +1058,6 @@
             displayHistory();
         });
 
-        // Adiciona o listener para o cabeçalho da transcrição recolhível
         const collapsibleHeader = transcriptionSection.querySelector('.collapsible-header');
         collapsibleHeader.addEventListener('click', () => {
             transcriptionSection.classList.toggle('is-collapsed');
@@ -1163,7 +1165,7 @@
             examsSection.classList.remove('hidden');
             prescriptionSection.classList.remove('hidden');
             timerDisplayEl.classList.remove('hidden');
-            transcriptionSection.classList.add('is-collapsed'); // Recolhe por padrão
+            transcriptionSection.classList.add('is-collapsed'); 
 
             isConsultationComplete = true;
             isLoadedFromHistory = true; 
@@ -1298,7 +1300,7 @@
         examsSection.classList.add('hidden');
         prescriptionSection.classList.add('hidden');
         timerDisplayEl.classList.add('hidden');
-        transcriptionSection.classList.remove('is-collapsed'); // Expande no reset
+        transcriptionSection.classList.remove('is-collapsed');
         
         statusEl.textContent = 'Clique no botão "Gravar Consulta" para iniciar.';
         correctionsTextarea.value = '';
@@ -1307,36 +1309,75 @@
         updateButtonsUI();
     }
 
+    // NOVA FUNÇÃO para verificar a permissão do microfone de forma inteligente
+    async function checkAndRequestMicrophonePermission() {
+        // Se a API de Permissões não for suportada, prossegue e deixa o getUserMedia lidar
+        if (!navigator.permissions) {
+            console.warn("API de Permissões não suportada. Prosseguindo diretamente...");
+            return true;
+        }
+        try {
+            const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+            
+            if (permissionStatus.state === 'granted') {
+                return true; // Permissão já concedida
+            }
+            
+            if (permissionStatus.state === 'denied') {
+                statusEl.textContent = 'Permissão de microfone bloqueada. Habilite-a nas configurações do site (ícone de cadeado).';
+                return false; // Permissão negada, não continuar
+            }
 
+            // Se o estado for 'prompt', o getUserMedia irá solicitar, então podemos prosseguir
+            return true;
+        } catch (e) {
+            console.error('Erro ao verificar permissão do microfone:', e);
+            statusEl.textContent = 'Erro ao verificar permissões.';
+            return false; // Erro, não continuar
+        }
+    }
+
+
+    // FUNÇÃO startRecording ATUALIZADA com a verificação de permissão
     async function startRecording() {
+        const canProceed = await checkAndRequestMicrophonePermission();
+        if (!canProceed) {
+            return; // Interrompe a execução se a permissão foi negada ou deu erro
+        }
+
         isLoadedFromHistory = false;
         if (!isConsultationComplete) {
-         resetApp(false);
+            resetApp(false);
         } else {
-         audioChunks = [];
-         statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
+            audioChunks = [];
+            statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
         }
 
         try {
-         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-         visualize(stream);
-         mediaRecorder = new MediaRecorder(stream);
-         mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-         mediaRecorder.onstop = processAudio;
-         
-         startTimer();
-         
-         mediaRecorder.start();
-         isRecording = true;
-         updateButtonsUI();
-         if (!isConsultationComplete) {
-           statusEl.textContent = 'Gravando... Fale agora.';
-         }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            visualize(stream);
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+            mediaRecorder.onstop = processAudio;
+            
+            startTimer();
+            
+            mediaRecorder.start();
+            isRecording = true;
+            updateButtonsUI();
+            if (!isConsultationComplete) {
+                statusEl.textContent = 'Gravando... Fale agora.';
+            }
         } catch (err) {
-         console.error("Erro ao acessar o microfone:", err);
-         statusEl.textContent = 'Erro! Não foi possível acessar o microfone. Verifique as permissões.';
+            console.error("Erro ao acessar o microfone:", err);
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                 statusEl.textContent = 'Você negou a permissão de acesso ao microfone.';
+            } else {
+                 statusEl.textContent = 'Erro! Não foi possível acessar o microfone. Verifique as permissões.';
+            }
         }
     }
+
     function pauseRecording() {
         if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
         mediaRecorder.pause();
@@ -1455,7 +1496,6 @@
         const corrections = correctionsTextarea.value.trim();
 
         if (isConsultationComplete && originalTranscriptionText) {
-            // CORREÇÃO: Adiciona as correções manuais ao prompt da gravação adicional
             let correctionsInstruction = '';
             if (corrections) {
                 correctionsInstruction = `
@@ -1558,7 +1598,7 @@
             improvementSection.classList.remove('hidden');
             examsSection.classList.remove('hidden');
             prescriptionSection.classList.remove('hidden');
-            transcriptionSection.classList.add('is-collapsed'); // Recolhe por padrão após gerar
+            transcriptionSection.classList.add('is-collapsed');
 
             const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
             statusEl.textContent = `Processo concluído em ${processingTime} segundos! Pronto para revisão.`;
