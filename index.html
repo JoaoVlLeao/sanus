@@ -536,6 +536,39 @@
         margin-bottom: 20px;
         color: var(--text-color);
     }
+    /* === [NOVO] Estilos para o Filtro de Data === */
+    .history-filters {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .history-filters label {
+        font-weight: 500;
+    }
+    .history-filters input[type="date"] {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-family: var(--font-family);
+    }
+    .history-filters button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .history-filters button:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
     #historyList {
         max-height: 50vh;
         overflow-y: auto;
@@ -721,6 +754,11 @@
   
   <dialog id="historyModal">
       <h2>Histórico de Consultas</h2>
+      <div class="history-filters">
+          <label for="historyDateFilter">Filtrar por data:</label>
+          <input type="date" id="historyDateFilter">
+          <button id="clearDateFilterButton">Limpar Filtro</button>
+      </div>
       <div id="historyList">
           </div>
       <div class="modal-actions">
@@ -769,6 +807,9 @@
     const historyListEl = document.getElementById('historyList');
     const closeHistoryButton = document.getElementById('closeHistoryButton');
     const clearHistoryButton = document.getElementById('clearHistoryButton');
+    // === [NOVO] Elementos do Filtro de Histórico ===
+    const historyDateFilter = document.getElementById('historyDateFilter');
+    const clearDateFilterButton = document.getElementById('clearDateFilterButton');
 
 
     // === VARIÁVEIS DE ESTADO ===
@@ -790,6 +831,7 @@
     let processingStartTime = 0;
     let originalTranscriptionText = '';
     let anamnesisMethod = 'tradicional';
+    let isLoadedFromHistory = false; // [NOVO] Flag para evitar duplicatas
 
 
     // === LÓGICA DE TEMAS E MENU DE CONFIGURAÇÕES ===
@@ -924,10 +966,20 @@
         const savedSpecialty = localStorage.getItem('anamnesis_specialty') || 'none';
         applySpecialty(savedSpecialty);
         
-        historyButton.addEventListener('click', displayHistory);
+        historyButton.addEventListener('click', () => {
+            historyDateFilter.value = ''; // Sempre limpa o filtro ao abrir
+            displayHistory();
+        });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
         historyListEl.addEventListener('click', loadConsultationFromHistory);
+        
+        // === [NOVO] Listeners para o filtro de data ===
+        historyDateFilter.addEventListener('change', displayHistory);
+        clearDateFilterButton.addEventListener('click', () => {
+            historyDateFilter.value = '';
+            displayHistory();
+        });
     });
     
     // === FUNÇÕES DE HISTÓRICO ===
@@ -960,10 +1012,27 @@
     }
 
     function displayHistory() {
-        const history = getHistory();
+        let history = getHistory();
+        const filterValue = historyDateFilter.value;
+
+        // [NOVO] Lógica de filtragem
+        if (filterValue) {
+            const selectedDate = new Date(filterValue + 'T00:00:00'); // Trata a data como local
+            history = history.filter(consultation => {
+                const consultationDate = new Date(consultation.id);
+                return consultationDate.getFullYear() === selectedDate.getFullYear() &&
+                       consultationDate.getMonth() === selectedDate.getMonth() &&
+                       consultationDate.getDate() === selectedDate.getDate();
+            });
+        }
+
         historyListEl.innerHTML = '';
         if (history.length === 0) {
-            historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta salva ainda.</p>';
+            if (filterValue) {
+                historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta encontrada para esta data.</p>';
+            } else {
+                historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta salva ainda.</p>';
+            }
         } else {
             history.forEach(consultation => {
                 const item = document.createElement('div');
@@ -983,7 +1052,9 @@
                 historyListEl.appendChild(item);
             });
         }
-        historyModal.showModal();
+        if (!historyModal.open) {
+            historyModal.showModal();
+        }
     }
 
     function loadConsultationFromHistory(e) {
@@ -1015,6 +1086,7 @@
             timerDisplayEl.classList.remove('hidden');
 
             isConsultationComplete = true;
+            isLoadedFromHistory = true; // [NOVO] Marca que foi carregado
             statusEl.textContent = `Consulta de ${new Date(consultation.id).toLocaleString('pt-BR')} carregada.`;
             updateButtonsUI();
             historyModal.close();
@@ -1024,7 +1096,7 @@
     function clearHistory() {
         if (confirm('Tem certeza que deseja apagar permanentemente todo o histórico de consultas? Esta ação não pode ser desfeita.')) {
             localStorage.removeItem(CONSULTATION_HISTORY_KEY);
-            displayHistory();
+            displayHistory(); // Atualiza a view
         }
     }
 
@@ -1120,13 +1192,15 @@
     resetButton.addEventListener('click', () => resetApp(true));
 
     function resetApp(saveCurrent = false) {
-        if (saveCurrent) {
+        // [MODIFICADO] Apenas salva se for uma consulta nova, e não uma carregada do histórico
+        if (saveCurrent && !isLoadedFromHistory) {
             saveConsultationToHistory();
         }
 
         isRecording = false;
         isPaused = false;
         isConsultationComplete = false;
+        isLoadedFromHistory = false; // [NOVO] Reseta o flag
         audioChunks = [];
         originalTranscriptionText = '';
         if (timerInterval) stopTimer();
@@ -1159,33 +1233,34 @@
 
 
     async function startRecording() {
-      if (!isConsultationComplete) {
-        resetApp(false);
-      } else {
-        audioChunks = [];
-        statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        visualize(stream);
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-        mediaRecorder.onstop = processAudio;
-        
-        accumulatedTime = 0; 
-        startTimer();
-        
-        mediaRecorder.start();
-        isRecording = true;
-        updateButtonsUI();
+        isLoadedFromHistory = false; // [NOVO] Garante que qualquer nova gravação é considerada "nova"
         if (!isConsultationComplete) {
-          statusEl.textContent = 'Gravando... Fale agora.';
+         resetApp(false);
+        } else {
+         audioChunks = [];
+         statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
         }
-      } catch (err) {
-        console.error("Erro ao acessar o microfone:", err);
-        statusEl.textContent = 'Erro! Não foi possível acessar o microfone. Verifique as permissões.';
-      }
+
+        try {
+         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+         visualize(stream);
+         mediaRecorder = new MediaRecorder(stream);
+         mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+         mediaRecorder.onstop = processAudio;
+         
+         accumulatedTime = 0; 
+         startTimer();
+         
+         mediaRecorder.start();
+         isRecording = true;
+         updateButtonsUI();
+         if (!isConsultationComplete) {
+           statusEl.textContent = 'Gravando... Fale agora.';
+         }
+        } catch (err) {
+         console.error("Erro ao acessar o microfone:", err);
+         statusEl.textContent = 'Erro! Não foi possível acessar o microfone. Verifique as permissões.';
+        }
     }
     function pauseRecording() {
         if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
