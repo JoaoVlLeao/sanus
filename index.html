@@ -502,6 +502,54 @@
 
     .output-content .placeholder { color: #777; font-style: italic; }
 
+    /* --- NOVOS ESTILOS PARA TRANSCRIÇÃO RECOLHÍVEL --- */
+    .collapsible .collapsible-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .collapsible .collapsible-header h2 {
+      margin-bottom: 0; /* Remove a margem original para alinhar com o botão */
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .collapsible .collapsible-header .toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 8px;
+    }
+    .collapsible .collapsible-header .toggle-btn svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.3s ease;
+    }
+    .collapsible .collapsible-content {
+      overflow: hidden;
+      transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out;
+      max-height: 1000px; /* Um valor alto para o estado expandido */
+      margin-top: 16px;
+    }
+    .collapsible.is-collapsed .collapsible-content {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      border-width: 0;
+    }
+    .collapsible.is-collapsed .collapsible-header h2 {
+      margin-bottom: 16px; /* Adiciona margem inferior quando recolhido */
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 8px;
+    }
+    .collapsible.is-collapsed .toggle-btn svg {
+      transform: rotate(-90deg);
+    }
+    /* --- FIM DOS NOVOS ESTILOS --- */
+
+
     #historyModal {
         max-width: 600px;
         width: 90%;
@@ -727,13 +775,19 @@
       <p id="estimationTimer"></p>
     </div>
 
-    <div class="output-section">
-      <h2>Transcrição da Consulta</h2>
-      <div id="transcription" class="output-content">
+    <div class="output-section collapsible" id="transcriptionSection">
+      <div class="collapsible-header">
+          <h2>Transcrição da Consulta</h2>
+          <button class="toggle-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+              </svg>
+          </button>
+      </div>
+      <div id="transcription" class="output-content collapsible-content">
         <span class="placeholder">A transcrição da conversa aparecerá aqui...</span>
       </div>
     </div>
-
     <div id="refineSection" class="output-section hidden">
         <h2>Correções e Adições Manuais</h2>
         <textarea id="correctionsTextarea" placeholder="Se a transcrição contiver erros, digite as correções ou informações adicionais aqui... Por exemplo: 'O paciente mencionou febre de 38.5 graus, não 37.5.'"></textarea>
@@ -831,6 +885,8 @@
     const clearHistoryButton = document.getElementById('clearHistoryButton');
     const historyDateFilter = document.getElementById('historyDateFilter');
     const clearDateFilterButton = document.getElementById('clearDateFilterButton');
+    const transcriptionSection = document.getElementById('transcriptionSection');
+
 
     let isRecording = false;
     let isPaused = false;
@@ -983,14 +1039,9 @@
         applySpecialty(savedSpecialty);
         
         historyButton.addEventListener('click', () => {
-            // Preenche e desabilita o campo ANTES de mostrar o modal
             historyDateFilter.value = getTodayISOString();
             historyDateFilter.disabled = true;
-
-            displayHistory(); // Abre o modal
-
-            // Reabilita o campo após um pequeno intervalo para o modal abrir completamente,
-            // evitando o bug de foco automático no mobile.
+            displayHistory(); 
             setTimeout(() => {
                 historyDateFilter.disabled = false;
             }, 150);
@@ -998,12 +1049,16 @@
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
         historyListEl.addEventListener('click', loadConsultationFromHistory);
-        
         historyDateFilter.addEventListener('change', displayHistory);
-
         clearDateFilterButton.addEventListener('click', () => {
             historyDateFilter.value = '';
             displayHistory();
+        });
+
+        // Adiciona o listener para o cabeçalho da transcrição recolhível
+        const collapsibleHeader = transcriptionSection.querySelector('.collapsible-header');
+        collapsibleHeader.addEventListener('click', () => {
+            transcriptionSection.classList.toggle('is-collapsed');
         });
     });
     
@@ -1108,6 +1163,7 @@
             examsSection.classList.remove('hidden');
             prescriptionSection.classList.remove('hidden');
             timerDisplayEl.classList.remove('hidden');
+            transcriptionSection.classList.add('is-collapsed'); // Recolhe por padrão
 
             isConsultationComplete = true;
             isLoadedFromHistory = true; 
@@ -1242,6 +1298,7 @@
         examsSection.classList.add('hidden');
         prescriptionSection.classList.add('hidden');
         timerDisplayEl.classList.add('hidden');
+        transcriptionSection.classList.remove('is-collapsed'); // Expande no reset
         
         statusEl.textContent = 'Clique no botão "Gravar Consulta" para iniciar.';
         correctionsTextarea.value = '';
@@ -1395,7 +1452,19 @@
         }
 
         let initialPromptInstruction;
+        const corrections = correctionsTextarea.value.trim();
+
         if (isConsultationComplete && originalTranscriptionText) {
+            // CORREÇÃO: Adiciona as correções manuais ao prompt da gravação adicional
+            let correctionsInstruction = '';
+            if (corrections) {
+                correctionsInstruction = `
+                Adicionalmente, o profissional fez as seguintes correções e adições manuais à transcrição anterior. Você DEVE incorporá-las na sua análise.
+                --- CORREÇÕES E ADIÇÕES MANUAIS ---
+                ${corrections}
+                --- FIM DAS CORREÇÕES E ADIÇÕES ---
+                `;
+            }
             initialPromptInstruction = `
             Você é um assistente médico que está atualizando uma consulta em andamento.
             Abaixo está a transcrição da **primeira parte** da consulta.
@@ -1403,7 +1472,9 @@
             ${originalTranscriptionText}
             --- FIM DA TRANSCRIÇÃO ANTERIOR ---
             
-            Sua tarefa é analisar o **novo áudio** fornecido e **integrar as novas informações** com os dados da transcrição anterior para gerar um conjunto de documentos **COMPLETO e ATUALIZADO**.
+            ${correctionsInstruction}
+
+            Sua tarefa é analisar o **novo áudio** fornecido e **integrar as novas informações** com os dados da transcrição anterior E as correções manuais para gerar um conjunto de documentos **COMPLETO e ATUALIZADO**.
             Siga as tarefas abaixo, usando os separadores exatos fornecidos:
             `;
         } else {
@@ -1487,6 +1558,7 @@
             improvementSection.classList.remove('hidden');
             examsSection.classList.remove('hidden');
             prescriptionSection.classList.remove('hidden');
+            transcriptionSection.classList.add('is-collapsed'); // Recolhe por padrão após gerar
 
             const processingTime = ((Date.now() - processingStartTime) / 1000).toFixed(1);
             statusEl.textContent = `Processo concluído em ${processingTime} segundos! Pronto para revisão.`;
