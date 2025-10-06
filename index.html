@@ -16,8 +16,8 @@
       --accent-color-stop: #ff4b2b;
       --success-color: #28a745;
       --warning-color: #ffc107;
-      --info-color: #17a2b8; /* Cor para o botão de reset */
-      --danger-color: #dc3545; /* [NOVO] Cor para o botão de apagar */
+      --info-color: #17a2b8;
+      --danger-color: #dc3545;
       --text-color: #e0e0e0;
       --background-color-main: #121212;
       --background-color-card: rgba(30, 30, 30, 0.7);
@@ -26,28 +26,22 @@
     }
 
     /* === NOVOS TEMAS === */
-    /* NOVO TEMA PRINCIPAL (Verde/Rosa) */
     body.theme-minty-pink {
         --primary-color: #009195;
         --secondary-color: #5ff4ab;
         --accent-color-start: #ff14a9;
-        --accent-color-stop: #ff14a9; /* Cor sólida conforme solicitado */
+        --accent-color-stop: #ff14a9;
     }
-    /* Para o novo tema, botões de ação principais também usam a cor de destaque */
     body.theme-minty-pink #refineButton,
     body.theme-minty-pink #sendButton {
         background: var(--accent-color-start);
     }
-
-
-    /* Tema Pôr do Sol */
     body.theme-sunset {
         --primary-color: #d35400;
         --secondary-color: #e67e22;
         --accent-color-start: #e74c3c;
         --accent-color-stop: #f1c40f;
     }
-    /* Tema Oceano */
     body.theme-ocean {
         --primary-color: #005aa7;
         --secondary-color: #00c6ff;
@@ -56,7 +50,6 @@
         --success-color: #20c997;
         --warning-color: #fd7e14;
     }
-    /* Tema Floresta */
     body.theme-forest {
         --primary-color: #134e5e;
         --secondary-color: #71b280;
@@ -65,7 +58,6 @@
         --success-color: #28a745;
         --text-color: #f0f0f0;
     }
-    /* Tema Rosa Escuro */
     body.theme-dark-rose {
         --primary-color: #e83e8c;
         --secondary-color: #6f42c1;
@@ -532,29 +524,13 @@
         margin-bottom: 20px;
         color: var(--text-color);
     }
-    .history-filter-controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    #showDateFilterButton {
-      background: none;
-      border: none;
-      color: var(--secondary-color);
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
-      font-size: 0.9rem;
-      padding: 4px;
-    }
     .history-filters {
         display: flex;
         gap: 12px;
         align-items: center;
         justify-content: center;
         flex-wrap: wrap;
+        margin-bottom: 20px;
     }
     .history-filters label {
         font-weight: 500;
@@ -566,7 +542,14 @@
         padding: 6px 10px;
         border-radius: 8px;
         font-family: var(--font-family);
+        color-scheme: dark; /* [NOVO] Ajuda a estilizar o calendário em alguns navegadores */
     }
+    /* === [NOVO] Deixa o ícone do calendário branco em navegadores Webkit (Chrome, Safari, Edge) === */
+    .history-filters input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(1.2);
+        cursor: pointer;
+    }
+
     .history-filters button {
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid var(--border-color);
@@ -626,21 +609,21 @@
     #clearHistoryButton { background-color: var(--danger-color); color: white; }
     #closeHistoryButton { background-color: var(--info-color); color: white; }
 
-    /* === [NOVO] ESTILOS PARA MOBILE === */
+    /* === ESTILOS PARA MOBILE === */
     @media (max-width: 768px) {
         body {
             padding: 0;
-            align-items: flex-start; /* Alinha o container no topo */
+            align-items: flex-start;
         }
         .container {
             max-width: 100%;
             min-height: 100vh;
-            padding: 24px 16px; /* Menos padding horizontal */
+            padding: 24px 16px;
             border-radius: 0;
             border: none;
             box-shadow: none;
-            backdrop-filter: none; /* Remove o blur para melhor performance */
-            background: transparent; /* O fundo agora é o gradiente do body */
+            backdrop-filter: none;
+            background: transparent;
         }
         .header img.main-logo {
             max-width: 200px;
@@ -653,7 +636,7 @@
             padding: 16px;
         }
         #historyModal {
-            width: calc(100% - 32px); /* Ocupa quase toda a largura */
+            width: calc(100% - 32px);
             padding: 16px;
         }
         .creator-credit {
@@ -802,13 +785,10 @@
   
   <dialog id="historyModal">
       <h2>Histórico de Consultas</h2>
-      <div class="history-filter-controls">
-          <button id="showDateFilterButton">Filtrar por outra data</button>
-          <div class="history-filters hidden">
-              <label for="historyDateFilter">Selecione a data:</label>
-              <input type="date" id="historyDateFilter">
-              <button id="clearDateFilterButton">Limpar Filtro</button>
-          </div>
+      <div class="history-filters">
+          <label for="historyDateFilter">Filtrar por data:</label>
+          <input type="date" id="historyDateFilter">
+          <button id="clearDateFilterButton">Limpar Filtro</button>
       </div>
       <div id="historyList">
           </div>
@@ -860,8 +840,6 @@
     const clearHistoryButton = document.getElementById('clearHistoryButton');
     const historyDateFilter = document.getElementById('historyDateFilter');
     const clearDateFilterButton = document.getElementById('clearDateFilterButton');
-    const showDateFilterButton = document.getElementById('showDateFilterButton');
-    const historyFiltersContainer = document.querySelector('.history-filters');
 
 
     // === VARIÁVEIS DE ESTADO ===
@@ -943,7 +921,6 @@
     });
 
 
-    // === LÓGICA DO CONTEXTO CLÍNICO (ESPECIALIDADES) ===
     const specialtyDrawer = document.querySelector('.specialty-drawer');
     const specialtyToggleButton = document.querySelector('.specialty-toggle-btn');
     const specialtyOptionsContainer = document.querySelector('.specialty-options');
@@ -1002,6 +979,14 @@
         }
     });
 
+    // === [NOVO] Função auxiliar para obter a data de hoje no formato YYYY-MM-DD ===
+    function getTodayISOString() {
+        const today = new Date();
+        const offset = today.getTimezoneOffset();
+        const todayLocal = new Date(today.getTime() - (offset * 60 * 1000));
+        return todayLocal.toISOString().split('T')[0];
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const savedTheme = localStorage.getItem('anamnesis_theme') || 'minty-pink';
         applyTheme(savedTheme);
@@ -1013,31 +998,21 @@
         applySpecialty(savedSpecialty);
         
         historyButton.addEventListener('click', () => {
-            historyFiltersContainer.classList.add('hidden');
-            showDateFilterButton.classList.remove('hidden');
-            historyDateFilter.value = '';
-            displayHistory();
+            historyDateFilter.value = getTodayISOString(); // Preenche com a data de hoje
+            displayHistory(); // Mostra o modal com o filtro aplicado
         });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
         historyListEl.addEventListener('click', loadConsultationFromHistory);
         
-        showDateFilterButton.addEventListener('click', () => {
-            historyFiltersContainer.classList.remove('hidden');
-            showDateFilterButton.classList.add('hidden');
-        });
-
         historyDateFilter.addEventListener('change', displayHistory);
 
         clearDateFilterButton.addEventListener('click', () => {
-            historyFiltersContainer.classList.add('hidden');
-            showDateFilterButton.classList.remove('hidden');
-            historyDateFilter.value = '';
-            displayHistory();
+            historyDateFilter.value = ''; // Limpa a data
+            displayHistory(); // Mostra todos os itens
         });
     });
     
-    // === FUNÇÕES DE HISTÓRICO ===
     function getHistory() {
         const historyJson = localStorage.getItem(CONSULTATION_HISTORY_KEY);
         return historyJson ? JSON.parse(historyJson) : [];
@@ -1069,31 +1044,26 @@
     function displayHistory() {
         let history = getHistory();
         const filterValue = historyDateFilter.value;
-        const isFilterActive = !historyFiltersContainer.classList.contains('hidden') && filterValue;
 
-        let dateToFilter;
-        if (isFilterActive) {
-            dateToFilter = new Date(filterValue + 'T00:00:00');
-        } else {
-            dateToFilter = new Date();
+        if (filterValue) {
+            const selectedDate = new Date(filterValue + 'T00:00:00');
+            history = history.filter(consultation => {
+                const consultationDate = new Date(consultation.id);
+                return consultationDate.getFullYear() === selectedDate.getFullYear() &&
+                       consultationDate.getMonth() === selectedDate.getMonth() &&
+                       consultationDate.getDate() === selectedDate.getDate();
+            });
         }
 
-        const filteredHistory = history.filter(consultation => {
-            const consultationDate = new Date(consultation.id);
-            return consultationDate.getFullYear() === dateToFilter.getFullYear() &&
-                   consultationDate.getMonth() === dateToFilter.getMonth() &&
-                   consultationDate.getDate() === dateToFilter.getDate();
-        });
-
         historyListEl.innerHTML = '';
-        if (filteredHistory.length === 0) {
-            if (isFilterActive) {
-                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta encontrada para a data selecionada.</p>`;
+        if (history.length === 0) {
+            if (filterValue) {
+                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta encontrada para esta data.</p>`;
             } else {
-                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta registrada hoje.</p>`;
+                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta salva ainda.</p>`;
             }
         } else {
-            filteredHistory.forEach(consultation => {
+            history.forEach(consultation => {
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 item.dataset.id = consultation.id;
@@ -1156,6 +1126,7 @@
     function clearHistory() {
         if (confirm('Tem certeza que deseja apagar permanentemente todo o histórico de consultas? Esta ação não pode ser desfeita.')) {
             localStorage.removeItem(CONSULTATION_HISTORY_KEY);
+            historyDateFilter.value = ''; // Limpa o filtro para mostrar o resultado vazio
             displayHistory();
         }
     }
@@ -1240,7 +1211,6 @@
       estimationTimerEl.textContent = '';
     }
 
-    // === LÓGICA PRINCIPAL DE GRAVAÇÃO E CONTROLES ===
     recordButton.addEventListener('click', startRecording);
     pauseButton.addEventListener('click', pauseRecording);
     resumeButton.addEventListener('click', resumeRecording);
@@ -1694,7 +1664,6 @@
     }
 
 
-    // === FUNÇÕES AUXILIARES ===
     function blobToBase64(blob) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
