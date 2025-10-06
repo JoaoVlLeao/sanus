@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Tema Padrão Antigo (Roxo/Azul) */
       --primary-color: #6a11cb;
       --secondary-color: #2575fc;
       --accent-color-start: #ff416c;
@@ -25,7 +24,6 @@
       --font-family: 'Poppins', sans-serif;
     }
 
-    /* === NOVOS TEMAS === */
     body.theme-minty-pink {
         --primary-color: #009195;
         --secondary-color: #5ff4ab;
@@ -67,8 +65,6 @@
         --border-color: rgba(255, 255, 255, 0.15);
     }
 
-
-    /* Estilos Gerais */
     body {
       font-family: var(--font-family);
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -542,9 +538,8 @@
         padding: 6px 10px;
         border-radius: 8px;
         font-family: var(--font-family);
-        color-scheme: dark; /* [NOVO] Ajuda a estilizar o calendário em alguns navegadores */
+        color-scheme: dark;
     }
-    /* === [NOVO] Deixa o ícone do calendário branco em navegadores Webkit (Chrome, Safari, Edge) === */
     .history-filters input[type="date"]::-webkit-calendar-picker-indicator {
         filter: invert(1) brightness(1.2);
         cursor: pointer;
@@ -622,8 +617,9 @@
             border-radius: 0;
             border: none;
             box-shadow: none;
-            backdrop-filter: none;
-            background: transparent;
+            /* [CORRIGIDO] As linhas abaixo foram removidas para restaurar o fundo escuro no mobile */
+            /* background: transparent; */
+            /* backdrop-filter: none; */
         }
         .header img.main-logo {
             max-width: 200px;
@@ -979,7 +975,6 @@
         }
     });
 
-    // === [NOVO] Função auxiliar para obter a data de hoje no formato YYYY-MM-DD ===
     function getTodayISOString() {
         const today = new Date();
         const offset = today.getTimezoneOffset();
@@ -998,8 +993,8 @@
         applySpecialty(savedSpecialty);
         
         historyButton.addEventListener('click', () => {
-            historyDateFilter.value = getTodayISOString(); // Preenche com a data de hoje
-            displayHistory(); // Mostra o modal com o filtro aplicado
+            historyDateFilter.value = getTodayISOString();
+            displayHistory();
         });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
@@ -1008,8 +1003,8 @@
         historyDateFilter.addEventListener('change', displayHistory);
 
         clearDateFilterButton.addEventListener('click', () => {
-            historyDateFilter.value = ''; // Limpa a data
-            displayHistory(); // Mostra todos os itens
+            historyDateFilter.value = '';
+            displayHistory();
         });
     });
     
@@ -1126,11 +1121,10 @@
     function clearHistory() {
         if (confirm('Tem certeza que deseja apagar permanentemente todo o histórico de consultas? Esta ação não pode ser desfeita.')) {
             localStorage.removeItem(CONSULTATION_HISTORY_KEY);
-            historyDateFilter.value = ''; // Limpa o filtro para mostrar o resultado vazio
+            historyDateFilter.value = '';
             displayHistory();
         }
     }
-
 
     function formatTime(totalSeconds) {
         const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
