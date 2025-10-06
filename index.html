@@ -511,6 +511,9 @@
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
     }
     #transcriptionSection.collapsible-active .collapsible-header h2 {
       margin-bottom: 0;
@@ -546,9 +549,7 @@
       opacity: 0;
     }
     #transcriptionSection.collapsible-active.is-collapsed .collapsible-header {
-        border-bottom: 2px solid var(--secondary-color);
-        padding-bottom: 8px;
-        margin-bottom: 12px; /* <<< ALTERAÇÃO: Reduz o espaçamento inferior */
+        margin-bottom: 12px; 
     }
     /* --- FIM DOS ESTILOS --- */
 
@@ -1581,8 +1582,9 @@
             const prescriptionText = (fullResponse.split('--- SUGESTAO DE PRESCRICAO ---')[1] || '').split('--- PONTOS DE MELHORIA ---')[0] || 'Nenhuma sugestão de prescrição.';
             const improvementsText = (fullResponse.split('--- PONTOS DE MELHORIA ---')[1] || 'Nenhum ponto de melhoria identificado.').trim();
 
+            // <<< ALTERAÇÃO: Lógica para fechar a aba instantaneamente na primeira vez
             const content = transcriptionSection.querySelector('.collapsible-content');
-            content.style.transition = 'none'; // Desativa a transição temporariamente
+            content.style.transition = 'none'; // 1. Desativa a transição temporariamente
 
             originalTranscriptionText = transcriptionText;
             transcriptionEl.innerHTML = transcriptionText || 'Não foi possível extrair a transcrição.';
@@ -1591,14 +1593,16 @@
             prescriptionSuggestionsEl.innerHTML = prescriptionText.trim();
             improvementsEl.innerHTML = improvementsText;
             
-            // <<< ALTERAÇÃO: Ativa e já recolhe a transcrição para que apareça fechada
+            // 2. Aplica as classes que fecham a aba
             transcriptionSection.classList.add('collapsible-active');
             transcriptionSection.classList.add('is-collapsed');
 
-            // Força o navegador a aplicar os estilos sem transição
+            // 3. Força o navegador a renderizar o estado fechado SEM animação
             content.offsetHeight; 
-            // Reativa a transição para futuras interações do usuário
+            
+            // 4. Reativa a transição para que funcione nos cliques do usuário
             content.style.transition = '';
+            // Fim da alteração >>>
 
             refineSection.classList.remove('hidden');
             examsSection.classList.remove('hidden');
@@ -1612,7 +1616,6 @@
             stopEstimationCountdown();
             updateButtonsUI();
             
-            // <<< ALTERAÇÃO: Salva no histórico assim que o prontuário é gerado
             saveConsultationToHistory();
 
         } catch (err) {
