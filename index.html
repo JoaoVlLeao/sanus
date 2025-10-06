@@ -984,6 +984,14 @@
         historyButton.addEventListener('click', () => {
             historyDateFilter.value = getTodayISOString();
             displayHistory();
+            
+            // [MODIFICADO] Adiciona um pequeno delay para remover o foco do input de data no mobile,
+            // evitando que o seletor de calendário abra automaticamente.
+            setTimeout(() => {
+                if (document.activeElement === historyDateFilter) {
+                    historyDateFilter.blur();
+                }
+            }, 0);
         });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
