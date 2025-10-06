@@ -536,13 +536,29 @@
         margin-bottom: 20px;
         color: var(--text-color);
     }
-    /* === [NOVO] Estilos para o Filtro de Data === */
+    /* === [MODIFICADO] Estilos para o Filtro de Data === */
+    .history-filter-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    #showDateFilterButton {
+      background: none;
+      border: none;
+      color: var(--secondary-color);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 0.9rem;
+      padding: 4px;
+    }
     .history-filters {
         display: flex;
         gap: 12px;
         align-items: center;
         justify-content: center;
-        margin-bottom: 20px;
         flex-wrap: wrap;
     }
     .history-filters label {
@@ -754,10 +770,13 @@
   
   <dialog id="historyModal">
       <h2>Histórico de Consultas</h2>
-      <div class="history-filters">
-          <label for="historyDateFilter">Filtrar por data:</label>
-          <input type="date" id="historyDateFilter">
-          <button id="clearDateFilterButton">Limpar Filtro</button>
+      <div class="history-filter-controls">
+          <button id="showDateFilterButton">Filtrar por outra data</button>
+          <div class="history-filters hidden">
+              <label for="historyDateFilter">Selecione a data:</label>
+              <input type="date" id="historyDateFilter">
+              <button id="clearDateFilterButton">Limpar Filtro</button>
+          </div>
       </div>
       <div id="historyList">
           </div>
@@ -810,6 +829,8 @@
     // === [NOVO] Elementos do Filtro de Histórico ===
     const historyDateFilter = document.getElementById('historyDateFilter');
     const clearDateFilterButton = document.getElementById('clearDateFilterButton');
+    const showDateFilterButton = document.getElementById('showDateFilterButton');
+    const historyFiltersContainer = document.querySelector('.history-filters');
 
 
     // === VARIÁVEIS DE ESTADO ===
@@ -831,7 +852,7 @@
     let processingStartTime = 0;
     let originalTranscriptionText = '';
     let anamnesisMethod = 'tradicional';
-    let isLoadedFromHistory = false; // [NOVO] Flag para evitar duplicatas
+    let isLoadedFromHistory = false; 
 
 
     // === LÓGICA DE TEMAS E MENU DE CONFIGURAÇÕES ===
@@ -967,16 +988,27 @@
         applySpecialty(savedSpecialty);
         
         historyButton.addEventListener('click', () => {
-            historyDateFilter.value = ''; // Sempre limpa o filtro ao abrir
+            // [MODIFICADO] Reseta a UI do filtro para o estado inicial
+            historyFiltersContainer.classList.add('hidden');
+            showDateFilterButton.classList.remove('hidden');
+            historyDateFilter.value = '';
             displayHistory();
         });
         closeHistoryButton.addEventListener('click', () => historyModal.close());
         clearHistoryButton.addEventListener('click', clearHistory);
         historyListEl.addEventListener('click', loadConsultationFromHistory);
         
-        // === [NOVO] Listeners para o filtro de data ===
+        // [MODIFICADO] Listeners para o novo fluxo do filtro
+        showDateFilterButton.addEventListener('click', () => {
+            historyFiltersContainer.classList.remove('hidden');
+            showDateFilterButton.classList.add('hidden');
+        });
+
         historyDateFilter.addEventListener('change', displayHistory);
+
         clearDateFilterButton.addEventListener('click', () => {
+            historyFiltersContainer.classList.add('hidden');
+            showDateFilterButton.classList.remove('hidden');
             historyDateFilter.value = '';
             displayHistory();
         });
@@ -1014,27 +1046,31 @@
     function displayHistory() {
         let history = getHistory();
         const filterValue = historyDateFilter.value;
+        const isFilterActive = !historyFiltersContainer.classList.contains('hidden') && filterValue;
 
-        // [NOVO] Lógica de filtragem
-        if (filterValue) {
-            const selectedDate = new Date(filterValue + 'T00:00:00'); // Trata a data como local
-            history = history.filter(consultation => {
-                const consultationDate = new Date(consultation.id);
-                return consultationDate.getFullYear() === selectedDate.getFullYear() &&
-                       consultationDate.getMonth() === selectedDate.getMonth() &&
-                       consultationDate.getDate() === selectedDate.getDate();
-            });
+        let dateToFilter;
+        if (isFilterActive) {
+            dateToFilter = new Date(filterValue + 'T00:00:00'); // Data selecionada pelo usuário
+        } else {
+            dateToFilter = new Date(); // Padrão: data de hoje
         }
 
+        const filteredHistory = history.filter(consultation => {
+            const consultationDate = new Date(consultation.id);
+            return consultationDate.getFullYear() === dateToFilter.getFullYear() &&
+                   consultationDate.getMonth() === dateToFilter.getMonth() &&
+                   consultationDate.getDate() === dateToFilter.getDate();
+        });
+
         historyListEl.innerHTML = '';
-        if (history.length === 0) {
-            if (filterValue) {
-                historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta encontrada para esta data.</p>';
+        if (filteredHistory.length === 0) {
+            if (isFilterActive) {
+                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta encontrada para a data selecionada.</p>`;
             } else {
-                historyListEl.innerHTML = '<p style="text-align: center;">Nenhuma consulta salva ainda.</p>';
+                historyListEl.innerHTML = `<p style="text-align: center;">Nenhuma consulta registrada hoje.</p>`;
             }
         } else {
-            history.forEach(consultation => {
+            filteredHistory.forEach(consultation => {
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 item.dataset.id = consultation.id;
@@ -1056,6 +1092,7 @@
             historyModal.showModal();
         }
     }
+
 
     function loadConsultationFromHistory(e) {
         const item = e.target.closest('.history-item');
@@ -1086,7 +1123,7 @@
             timerDisplayEl.classList.remove('hidden');
 
             isConsultationComplete = true;
-            isLoadedFromHistory = true; // [NOVO] Marca que foi carregado
+            isLoadedFromHistory = true; 
             statusEl.textContent = `Consulta de ${new Date(consultation.id).toLocaleString('pt-BR')} carregada.`;
             updateButtonsUI();
             historyModal.close();
@@ -1096,7 +1133,7 @@
     function clearHistory() {
         if (confirm('Tem certeza que deseja apagar permanentemente todo o histórico de consultas? Esta ação não pode ser desfeita.')) {
             localStorage.removeItem(CONSULTATION_HISTORY_KEY);
-            displayHistory(); // Atualiza a view
+            displayHistory();
         }
     }
 
@@ -1192,7 +1229,6 @@
     resetButton.addEventListener('click', () => resetApp(true));
 
     function resetApp(saveCurrent = false) {
-        // [MODIFICADO] Apenas salva se for uma consulta nova, e não uma carregada do histórico
         if (saveCurrent && !isLoadedFromHistory) {
             saveConsultationToHistory();
         }
@@ -1200,7 +1236,7 @@
         isRecording = false;
         isPaused = false;
         isConsultationComplete = false;
-        isLoadedFromHistory = false; // [NOVO] Reseta o flag
+        isLoadedFromHistory = false;
         audioChunks = [];
         originalTranscriptionText = '';
         if (timerInterval) stopTimer();
@@ -1233,7 +1269,7 @@
 
 
     async function startRecording() {
-        isLoadedFromHistory = false; // [NOVO] Garante que qualquer nova gravação é considerada "nova"
+        isLoadedFromHistory = false;
         if (!isConsultationComplete) {
          resetApp(false);
         } else {
