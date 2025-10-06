@@ -96,8 +96,8 @@
     .creator-credit {
         position: absolute;
         bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
+        left: auto;
+        transform: none;
         font-size: 0.75rem;
         color: var(--text-color);
         opacity: 0.6;
@@ -500,7 +500,11 @@
         min-height: 22px;
     }
 
-    .output-content .placeholder { color: #777; font-style: italic; }
+    .output-content .placeholder {
+        display: block;
+        color: #777;
+        font-style: italic;
+    }
 
     /* --- ESTILOS CORRIGIDOS PARA TRANSCRIÇÃO RECOLHÍVEL --- */
     .collapsible-header .toggle-btn {
@@ -668,6 +672,8 @@
             border-radius: 0;
             border: none;
             box-shadow: none;
+            display: flex;
+            flex-direction: column;
         }
         .header img.main-logo {
             max-width: 200px;
@@ -686,7 +692,8 @@
         .creator-credit {
             position: static;
             padding: 24px 0;
-            margin-top: 16px;
+            margin-top: auto;
+            text-align: center;
         }
     }
 
