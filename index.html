@@ -541,7 +541,6 @@
         color-scheme: dark;
     }
     .history-filters input[type="date"]::-webkit-calendar-picker-indicator {
-        /* [MODIFICADO] Regra mais robusta para forçar o ícone a ficar branco */
         filter: brightness(0) invert(1);
         cursor: pointer;
     }
@@ -793,7 +792,6 @@
 
 
   <script>
-    // [CÓDIGO JAVASCRIPT IDÊNTICO AO ANTERIOR - NENHUMA MUDANÇA FUNCIONAL FOI NECESSÁRIA]
   (function(){
     const GEMINI_API_KEY = 'AIzaSyAPfkx1oy28ZG8U3jfTdGuCENLhb6tG_DQ';
     const MODEL = 'gemini-2.5-flash';
@@ -1426,11 +1424,13 @@
               * Apresente sob o título "--- SUGESTAO DE EXAMES ---".
 
           4.  **Sugerir Prescrição de Medicamentos:**
-              * A **escolha do medicamento** deve ser baseada **exclusivamente** na(s) fonte(s) de referência.
-              * Para cada medicamento, forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
-              * **Após CADA prescrição**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
-              * Ao final da lista, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s).
-              * Se nenhuma prescrição for indicada pelas fontes, escreva "Nenhuma prescrição específica sugerida com base nas fontes." e, na linha de fontes, adicione "<strong>Fontes das Sugestões de Prescrição:</strong> Nenhuma fonte aplicável.".
+              * Organize as sugestões em duas seções, se aplicável: <strong>Tratamento Específico</strong> (para a condição principal) e <strong>Tratamento Sintomático</strong> (para alívio de sintomas como dor, febre, etc.).
+              * Para o <strong>Tratamento Específico</strong>, a escolha do medicamento deve ser baseada **prioritariamente** na(s) fonte(s) de referência fornecida(s).
+              * Para o <strong>Tratamento Sintomático</strong>, você pode sugerir medicamentos de uso comum (ex: Dipirona 500mg para dor ou febre), baseando-se em diretrizes clínicas gerais de ampla aceitação. Para estes, não é obrigatório citar a fonte específica fornecida, mas a conduta deve ser clinicamente correta.
+              * Para cada medicamento (específico ou sintomático), forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
+              * **Após CADA prescrição de tratamento específico**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
+              * Ao final de toda a lista, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s) usadas para o tratamento específico.
+              * Se nenhuma prescrição for indicada, escreva "Nenhuma prescrição específica sugerida com base nas informações e fontes."
               * Apresente sob o título "--- SUGESTAO DE PRESCRICAO ---".
 
           5.  **Analisar Pontos de Melhoria:**
@@ -1592,11 +1592,13 @@
             * Apresente esta seção e DEPOIS use o separador "--- SUGESTAO DE PRESCRICAO ---".
 
         3.  **Sugerir Prescrição (Corrigido)**:
-            * A **escolha do medicamento** deve ser baseada **exclusivamente** na(s) fonte(s) de referência para o caso corrigido.
-            * Forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
-            * **Após CADA prescrição**, cite a fonte que embasou a *escolha* do fármaco (ex: (Fonte: CAB nº36, Pág. 40)).
-            * Ao final, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s).
-            * Se nenhuma prescrição for indicada, escreva "Nenhuma prescrição específica sugerida com base nas fontes." e adicione "<strong>Fontes das Sugestões de Prescrição:</strong> Nenhuma fonte aplicável.".
+            * Reorganize as sugestões em duas seções, se aplicável: <strong>Tratamento Específico</strong> e <strong>Tratamento Sintomático</strong>, incorporando as correções do profissional.
+            * Para o <strong>Tratamento Específico</strong>, baseie a escolha do medicamento **prioritariamente** na(s) fonte(s) de referência fornecida(s).
+            * Para o <strong>Tratamento Sintomático</strong>, sugira medicamentos de uso comum (ex: Dipirona 500mg) conforme as diretrizes clínicas gerais e as informações corrigidas.
+            * Para cada medicamento, forneça: <strong>Nome do Medicamento</strong>, <strong>Posologia</strong>, <strong>Modo de Uso</strong> e <strong>Tempo de Tratamento</strong>.
+            * **Após CADA prescrição de tratamento específico**, cite a fonte (ex: (Fonte: CAB nº36, Pág. 40)).
+            * Ao final, adicione "<strong>Fontes das Sugestões de Prescrição:</strong>" e liste a(s) fonte(s) completa(s) usadas para o tratamento específico.
+            * Se nenhuma prescrição for indicada, escreva "Nenhuma prescrição específica sugerida com base nas informações e fontes.".
             * Apresente esta seção e DEPOIS use o separador "--- PONTOS DE MELHORIA ---".
 
         4.  **Analisar Pontos de Melhoria (Corrigido)**:
