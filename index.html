@@ -792,7 +792,6 @@
 
 
   <script>
-    // [CÓDIGO JAVASCRIPT IDÊNTICO AO ANTERIOR, EXCETO PELA CORREÇÃO DO BUG MOBILE]
   (function(){
     const GEMINI_API_KEY = 'AIzaSyAPfkx1oy28ZG8U3jfTdGuCENLhb6tG_DQ';
     const MODEL = 'gemini-2.5-flash';
@@ -850,7 +849,7 @@
     let processingStartTime = 0;
     let originalTranscriptionText = '';
     let anamnesisMethod = 'tradicional';
-    let isLoadedFromHistory = false; 
+    let isLoadedFromHistory = false;
 
     const settingsDrawer = document.querySelector('.settings-drawer');
     const settingsToggleButton = document.querySelector('.settings-toggle-btn');
@@ -1014,7 +1013,7 @@
 
     function saveConsultationToHistory() {
         const hasPlaceholder = transcriptionEl.querySelector('.placeholder');
-        if (!isConsultationComplete || hasPlaceholder || !transcriptionEl.textContent.trim()) {
+        if (!isConsultationComplete || hasPlaceholder || !transcriptionEl.textContent.trim() || isLoadedFromHistory) {
             return;
         }
 
@@ -1090,7 +1089,7 @@
         const consultation = history.find(c => c.id === consultationId);
 
         if (consultation) {
-            resetApp(false);
+            resetApp();
 
             transcriptionEl.innerHTML = consultation.transcription;
             anamnesisEl.innerHTML = consultation.anamnesis;
@@ -1209,13 +1208,9 @@
     resumeButton.addEventListener('click', resumeRecording);
     sendButton.addEventListener('click', stopAndSend);
     refineButton.addEventListener('click', handleRefinement);
-    resetButton.addEventListener('click', () => resetApp(true));
+    resetButton.addEventListener('click', resetApp);
 
-    function resetApp(saveCurrent = false) {
-        if (saveCurrent && !isLoadedFromHistory) {
-            saveConsultationToHistory();
-        }
-
+    function resetApp() {
         isRecording = false;
         isPaused = false;
         isConsultationComplete = false;
@@ -1254,7 +1249,7 @@
     async function startRecording() {
         isLoadedFromHistory = false;
         if (!isConsultationComplete) {
-         resetApp(false);
+         resetApp();
         } else {
          audioChunks = [];
          statusEl.textContent = 'Gravando áudio adicional para complementar a consulta...';
@@ -1274,7 +1269,7 @@
          isRecording = true;
          updateButtonsUI();
          if (!isConsultationComplete) {
-           statusEl.textContent = 'Gravando... Fale agora.';
+          statusEl.textContent = 'Gravando... Fale agora.';
          }
         } catch (err) {
          console.error("Erro ao acessar o microfone:", err);
@@ -1495,7 +1490,7 @@
             isConsultationComplete = true;
             stopEstimationCountdown();
             updateButtonsUI();
-
+            saveConsultationToHistory(); // <-- SALVAMENTO AUTOMÁTICO AQUI
 
         } catch (err) {
             console.error("Erro na chamada da API:", err);
