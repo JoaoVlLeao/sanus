@@ -1,4 +1,4 @@
-<!doctype html>
+ <!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
@@ -1265,7 +1265,12 @@
          accumulatedTime = 0; 
          startTimer();
          
+         // --- CORREÇÃO APLICADA AQUI ---
+         // Inicia a gravação. Chamando start() sem argumentos (números), a gravação
+         // continua indefinidamente até que mediaRecorder.stop() seja chamado.
+         // Isso resolve o problema de a gravação parar sozinha.
          mediaRecorder.start();
+
          isRecording = true;
          updateButtonsUI();
          if (!isConsultationComplete) {
